@@ -13,6 +13,7 @@ import { ChangePasswordForm } from './components/auth/ChangePasswordForm';
 import { TransactionModal } from './components/treasury/TransactionModal';
 import { MemberModal } from './components/members/MemberModal';
 import { SessionModal } from './components/attendance/SessionModal';
+import { Profile } from './components/profile/Profile';
 
 function App() {
   const [user, setUser] = useState<Member | null>(null);
@@ -26,6 +27,7 @@ function App() {
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showMemberModal, setShowMemberModal] = useState(false);
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showSessionModal, setShowSessionModal] = useState(false);
 
   useEffect(() => {
@@ -125,19 +127,29 @@ function App() {
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData);
     data.paysThroughLodge = data.paysThroughLodge === 'on' ? '1' : '0';
+    data.disconnected = data.disconnected === 'on' ? '1' : '0';
     
-    const res = await fetch('/api/members', {
-      method: 'POST',
+    const url = editingMember ? `/api/members/${editingMember.id}` : '/api/members';
+    const method = editingMember ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
     if (res.ok) {
       setShowMemberModal(false);
+      setEditingMember(null);
       fetchData();
-      toast.success("Obreiro cadastrado com sucesso!");
+      toast.success(editingMember ? "Obreiro atualizado com sucesso!" : "Obreiro cadastrado com sucesso!");
     } else {
-      toast.error("Erro ao cadastrar obreiro.");
+      toast.error(editingMember ? "Erro ao atualizar obreiro." : "Erro ao cadastrar obreiro.");
     }
+  };
+
+  const handleEditMember = (member: Member) => {
+    setEditingMember(member);
+    setShowMemberModal(true);
   };
 
   const handleNewSession = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -193,10 +205,17 @@ function App() {
   const handleUpdatePalavra = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const newValue = formData.get('palavra') as string;
+    
+    if (newValue === '********') {
+      toast.info("Nenhuma alteração detectada na Palavra Semestral.");
+      return;
+    }
+
     const res = await fetch('/api/settings/palavra', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value: formData.get('palavra') })
+      body: JSON.stringify({ value: newValue })
     });
     if (res.ok) {
       toast.success("Configurações atualizadas com sucesso!");
@@ -248,14 +267,15 @@ function App() {
             {activeTab === 'dashboard' && <Dashboard stats={stats} transactions={transactions} sessions={sessions} />}
             {activeTab === 'treasury' && <Treasury stats={stats} transactions={transactions} onAddTransaction={() => setShowTransactionModal(true)} />}
             {activeTab === 'attendance' && <Attendance sessions={sessions} onNewSession={() => setShowSessionModal(true)} />}
-            {activeTab === 'members' && <Members members={members} transactions={transactions} onAddMember={() => setShowMemberModal(true)} onToggleDisconnected={handleToggleDisconnected} onTogglePays={handleTogglePays} />}
+            {activeTab === 'members' && <Members members={members} transactions={transactions} onAddMember={() => { setEditingMember(null); setShowMemberModal(true); }} onEditMember={handleEditMember} onToggleDisconnected={handleToggleDisconnected} onTogglePays={handleTogglePays} />}
             {activeTab === 'settings' && <Settings palavraSemestral={palavraSemestral} onUpdatePalavra={handleUpdatePalavra} />}
+            {activeTab === 'profile' && <Profile user={user} onUpdateUser={setUser} />}
           </div>
         </div>
       </main>
 
       {showTransactionModal && <TransactionModal members={members} onClose={() => setShowTransactionModal(false)} onSubmit={handleAddTransaction} />}
-      {showMemberModal && <MemberModal onClose={() => setShowMemberModal(false)} onSubmit={handleAddMember} />}
+      {showMemberModal && <MemberModal member={editingMember} onClose={() => { setShowMemberModal(false); setEditingMember(null); }} onSubmit={handleAddMember} />}
       {showSessionModal && <SessionModal members={members} onClose={() => setShowSessionModal(false)} onSubmit={handleNewSession} />}
     </div>
   );

@@ -1,17 +1,18 @@
 import React from 'react';
-import { Plus, UserPlus, Search, MoreHorizontal, Shield, UserX, Wallet, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plus, UserPlus, Search, MoreHorizontal, Shield, UserX, Wallet, CheckCircle2, AlertCircle, Edit2 } from 'lucide-react';
 import { Member, Transaction } from '../../types';
 import { Card } from '../ui/Card';
 import { cn } from '../../lib/utils';
 
 const calculateCompliance = (member: Member, transactions: Transaction[]) => {
   if (!member.paysThroughLodge) return 'Isento';
-  if (!member.initiationDate) return 'Sem Data';
+  const startDateStr = member.paymentStartDate || member.initiationDate;
+  if (!startDateStr) return 'Sem Data';
 
-  const initiation = new Date(member.initiationDate);
+  const startDate = new Date(startDateStr);
   const now = new Date();
   
-  const monthsSinceInitiation = (now.getFullYear() - initiation.getFullYear()) * 12 + (now.getMonth() - initiation.getMonth()) + 1;
+  const monthsSinceStart = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth()) + 1;
   
   const payments = transactions.filter(t => 
     t.memberId === member.id && 
@@ -19,19 +20,21 @@ const calculateCompliance = (member: Member, transactions: Transaction[]) => {
     t.type === 'income'
   ).length;
 
-  return payments >= monthsSinceInitiation ? 'Adimplente' : 'Inadimplente';
+  return payments >= monthsSinceStart ? 'Adimplente' : 'Inadimplente';
 };
 
 export const Members = ({ 
   members, 
   transactions,
   onAddMember, 
+  onEditMember,
   onToggleDisconnected, 
   onTogglePays 
 }: { 
   members: Member[]; 
   transactions: Transaction[];
   onAddMember: () => void;
+  onEditMember: (member: Member) => void;
   onToggleDisconnected: (id: number) => void;
   onTogglePays: (id: number) => void;
 }) => (
@@ -134,8 +137,12 @@ export const Members = ({
                       >
                         {m.disconnected ? <Shield size={18} /> : <UserX size={18} />}
                       </button>
-                      <button className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all">
-                        <MoreHorizontal size={20} />
+                      <button 
+                        onClick={() => onEditMember(m)}
+                        title="Editar Obreiro"
+                        className="p-2 text-slate-400 hover:text-lodge-green hover:bg-lodge-green/5 rounded-xl transition-all"
+                      >
+                        <Edit2 size={18} />
                       </button>
                     </div>
                   </td>

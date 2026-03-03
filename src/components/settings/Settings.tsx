@@ -30,9 +30,12 @@ export const Settings = ({
               name="palavra"
               type="text" 
               defaultValue={palavraSemestral}
+              onFocus={(e) => { if (e.target.value === '********') e.target.value = ''; }}
+              onBlur={(e) => { if (e.target.value === '') e.target.value = '********'; }}
               className="w-full pl-14 pr-6 py-4 bg-slate-50 rounded-2xl border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all font-bold text-slate-900"
             />
           </div>
+          <p className="text-[10px] text-slate-400 mt-2 ml-1">Para manter a palavra atual, deixe o campo como está.</p>
         </div>
 
         <button type="submit" className="w-full py-4 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold">

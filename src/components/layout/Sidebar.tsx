@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Wallet, Calendar, Users, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, Calendar, Users, Settings as SettingsIcon, LogOut, UserCircle } from 'lucide-react';
 import { SidebarItem } from '../ui/SidebarItem';
 import { Tab, Member } from '../../types';
 import { TAB_LABELS } from '../../constants';
@@ -75,7 +75,17 @@ export const Sidebar = ({
         )}
       </nav>
 
-      <div className="pt-6 border-t border-white/10">
+      <div className="pt-6 border-t border-white/10 space-y-2">
+        <button 
+          onClick={() => setActiveTab('profile')}
+          className={cn(
+            "w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all duration-200",
+            activeTab === 'profile' ? "bg-lodge-gold text-lodge-dark font-bold" : "text-slate-400 hover:bg-white/5"
+          )}
+        >
+          <UserCircle size={20} />
+          <span className="text-sm">Meu Perfil</span>
+        </button>
         <button 
           onClick={onLogout}
           className="w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl text-rose-400 hover:bg-rose-500/10 transition-all duration-200"

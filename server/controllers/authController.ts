@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
 import db from "../models/db";
+import { normalizePalavra } from "../utils/normalize";
 
 export const login = (req: Request, res: Response) => {
   const { cim, password, palavraSemestral } = req.body;
@@ -13,8 +15,11 @@ export const login = (req: Request, res: Response) => {
 
   const settings = db.prepare("SELECT value FROM settings WHERE key = 'palavra_semestral'").get() as { value: string };
   
-  if (!trimmedPalavra || trimmedPalavra.toLowerCase() !== settings.value.toLowerCase()) {
-    console.log(`Login failed for CIM ${trimmedCim}: Incorrect Palavra Semestral (Expected: ${settings.value}, Received: ${trimmedPalavra})`);
+  const normalizedInputPalavra = normalizePalavra(trimmedPalavra || "");
+  const isPalavraValid = settings && bcrypt.compareSync(normalizedInputPalavra, settings.value);
+
+  if (!isPalavraValid) {
+    console.log(`Login failed for CIM ${trimmedCim}: Incorrect Palavra Semestral`);
     return res.status(401).json({ success: false, error: "Palavra Semestral incorreta." });
   }
 
@@ -33,8 +38,10 @@ export const login = (req: Request, res: Response) => {
 
   if (member) {
     const m = member as any;
-    if (m.password !== trimmedPassword) {
-      console.log(`Login failed for CIM ${trimmedCim}: Incorrect Password (Received: ${trimmedPassword}, DB has: ${m.password})`);
+    const isPasswordValid = bcrypt.compareSync(trimmedPassword, m.password);
+    
+    if (!isPasswordValid) {
+      console.log(`Login failed for CIM ${trimmedCim}: Incorrect Password`);
       return res.status(401).json({ success: false, error: "CIM ou Senha incorretos." });
     }
 
@@ -58,7 +65,8 @@ export const login = (req: Request, res: Response) => {
 export const changePassword = (req: Request, res: Response) => {
   const { id, newPassword } = req.body;
   try {
-    db.prepare("UPDATE members SET password = ?, must_change_password = 0 WHERE id = ?").run(newPassword, id);
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    db.prepare("UPDATE members SET password = ?, must_change_password = 0 WHERE id = ?").run(hashedPassword, id);
     res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ error: error.message });

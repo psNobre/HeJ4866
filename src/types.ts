@@ -7,6 +7,7 @@ export interface Member {
   initiationDate?: string;
   elevationDate?: string;
   exaltationDate?: string;
+  paymentStartDate?: string;
   paysThroughLodge: number;
   disconnected: number;
   active: number;
@@ -64,4 +65,4 @@ export interface Stats {
   lastAttendanceRate: number;
 }
 
-export type Tab = 'dashboard' | 'treasury' | 'attendance' | 'members' | 'settings';
+export type Tab = 'dashboard' | 'treasury' | 'attendance' | 'members' | 'settings' | 'profile';

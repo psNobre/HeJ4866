@@ -5,5 +5,6 @@ export const TAB_LABELS: Record<Tab, string> = {
   treasury: 'Tesouraria',
   attendance: 'Frequência',
   members: 'Obreiros',
-  settings: 'Configurações'
+  settings: 'Configurações',
+  profile: 'Meu Perfil'
 };
