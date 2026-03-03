@@ -2,7 +2,10 @@ import Database from "better-sqlite3";
 import bcrypt from "bcrypt";
 import { normalizePalavra } from "../utils/normalize";
 
-const db = new Database("masonic_lodge.db");
+import path from "path";
+
+const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), "masonic_lodge.db");
+const db = new Database(dbPath);
 
 // Initialize database
 db.exec(`
