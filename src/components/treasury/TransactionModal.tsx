@@ -66,14 +66,53 @@ export const TransactionModal = ({
           </div>
 
           {selectedCategory === 'Mensalidade' && (
-            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Obreiro</label>
-              <select name="memberId" required className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all">
-                <option value="">Selecione um obreiro...</option>
-                {members.filter(m => m.active && !m.disconnected).map(m => (
-                  <option key={m.id} value={m.id}>{m.name} (CIM: {m.cim})</option>
-                ))}
-              </select>
+            <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Obreiro</label>
+                <select name="memberId" required className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all">
+                  <option value="">Selecione um obreiro...</option>
+                  {members.filter(m => m.active && !m.disconnected).map(m => (
+                    <option key={m.id} value={m.id}>{m.name} (CIM: {m.cim})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Mês Referente</label>
+                  <select 
+                    name="month" 
+                    required 
+                    defaultValue={new Date().getMonth() + 1}
+                    className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                  >
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Ano Referente</label>
+                  <select 
+                    name="year" 
+                    required 
+                    defaultValue={new Date().getFullYear()}
+                    className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                  >
+                    {[2024, 2025, 2026, 2027].map(y => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
           )}
 

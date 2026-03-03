@@ -1,100 +1,138 @@
-import React from 'react';
-import { Wallet, Users, Calendar, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Stats, Transaction, Session } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { Wallet, Calendar, AlertCircle, CheckCircle2, Clock, ListChecks } from 'lucide-react';
+import { Member, Transaction, Session } from '../../types';
 import { StatCard } from '../ui/StatCard';
 import { Card } from '../ui/Card';
 
-const data = [
-  { name: 'Jan', value: 4000 },
-  { name: 'Fev', value: 3000 },
-  { name: 'Mar', value: 5000 },
-  { name: 'Abr', value: 2780 },
-  { name: 'Mai', value: 1890 },
-  { name: 'Jun', value: 2390 },
-];
+interface MemberStats {
+  attendanceRate: number;
+  compliance: string;
+  missingMonths: string[];
+  totalPayments: number;
+  requiredPayments: number;
+}
 
-export const Dashboard = ({ stats, transactions, sessions }: { 
-  stats: Stats; 
+export const Dashboard = ({ user, transactions, sessions }: { 
+  user: Member; 
   transactions: Transaction[]; 
   sessions: Session[];
-}) => (
-  <div className="space-y-10">
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <StatCard 
-        title="Saldo em Caixa" 
-        value={`R$ ${stats.balance.toLocaleString()}`} 
-        icon={Wallet} 
-        color="bg-emerald-50 text-emerald-600"
-        trend={{ value: "+12%", positive: true }}
-      />
-      <StatCard 
-        title="Obreiros Ativos" 
-        value={stats.activeMembers} 
-        icon={Users} 
-        color="bg-indigo-50 text-indigo-600"
-      />
-      <StatCard 
-        title="Frequência Média" 
-        value={`${stats.lastAttendanceRate}%`} 
-        icon={Calendar} 
-        color="bg-amber-50 text-amber-600"
-        trend={{ value: "-2%", positive: false }}
-      />
-      <StatCard 
-        title="Receita Mensal" 
-        value={`R$ ${stats.income.toLocaleString()}`} 
-        icon={TrendingUp} 
-        color="bg-rose-50 text-rose-600"
-      />
-    </div>
+}) => {
+  const [memberStats, setMemberStats] = useState<MemberStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-      <Card className="lg:col-span-2" title="Fluxo de Caixa" subtitle="Movimentação financeira dos últimos 6 meses">
-        <div className="h-[400px] w-full mt-10">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
-              <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-              <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dx={-10} />
-              <Tooltip 
-                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-              />
-              <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
+  useEffect(() => {
+    const fetchMemberStats = async () => {
+      try {
+        const res = await fetch(`/api/members/${user.id}/stats`);
+        const data = await res.json();
+        setMemberStats(data);
+      } catch (error) {
+        console.error("Error fetching member stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      <Card title="Últimas Atividades" subtitle="Movimentações recentes">
-        <div className="space-y-6 mt-10">
-          {transactions.slice(0, 5).map((t) => (
-            <div key={t.id} className="flex items-center justify-between group cursor-pointer hover:bg-slate-50 p-3 rounded-2xl transition-colors">
-              <div className="flex items-center space-x-4">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", t.type === 'income' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600")}>
-                  {t.type === 'income' ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} />}
+    fetchMemberStats();
+  }, [user.id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lodge-green"></div>
+      </div>
+    );
+  }
+
+  const userTransactions = transactions.filter(t => t.memberId === user.id);
+
+  return (
+    <div className="space-y-10">
+      <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+        <h1 className="text-3xl font-bold text-slate-900">Olá, {user.name}</h1>
+        <p className="text-slate-500 mt-2">Bem-vindo ao seu painel pessoal. Aqui você pode acompanhar sua situação na Loja.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <StatCard 
+          title="Sua Frequência" 
+          value={`${memberStats?.attendanceRate || 0}%`} 
+          icon={Calendar} 
+          color="bg-amber-50 text-amber-600"
+        />
+        <StatCard 
+          title="Status Tesouraria" 
+          value={memberStats?.compliance || '---'} 
+          icon={memberStats?.compliance === 'Adimplente' ? CheckCircle2 : AlertCircle} 
+          color={memberStats?.compliance === 'Adimplente' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}
+        />
+        <StatCard 
+          title="Mensalidades Pagas" 
+          value={`${memberStats?.totalPayments || 0} / ${memberStats?.requiredPayments || 0}`} 
+          icon={Wallet} 
+          color="bg-indigo-50 text-indigo-600"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <Card title="Meses em Aberto" subtitle="Mensalidades pendentes de pagamento">
+          <div className="mt-8 space-y-4">
+            {memberStats?.missingMonths && memberStats.missingMonths.length > 0 ? (
+              memberStats.missingMonths.map((month, idx) => (
+                <div key={idx} className="flex items-center space-x-4 p-4 bg-rose-50 rounded-2xl border border-rose-100">
+                  <Clock className="text-rose-600" size={20} />
+                  <span className="text-sm font-bold text-rose-900">{month}</span>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-900">{t.description}</p>
-                  <p className="text-xs text-slate-500 font-medium">{t.date}</p>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+                  <CheckCircle2 className="text-emerald-600" size={32} />
                 </div>
+                <p className="text-slate-900 font-bold">Tudo em dia!</p>
+                <p className="text-slate-500 text-sm mt-1">Você não possui mensalidades pendentes.</p>
               </div>
-              <span className={cn("text-sm font-bold", t.type === 'income' ? "text-emerald-600" : "text-rose-600")}>
-                {t.type === 'income' ? '+' : '-'} R$ {t.amount}
-              </span>
-            </div>
-          ))}
-        </div>
-      </Card>
+            )}
+          </div>
+        </Card>
+
+        <Card title="Seus Pagamentos Recentes" subtitle="Últimas mensalidades registradas">
+          <div className="space-y-6 mt-8">
+            {userTransactions.length > 0 ? (
+              userTransactions.slice(0, 5).map((t) => (
+                <div key={t.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                      <Wallet size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{t.description}</p>
+                      <div className="flex items-center space-x-2">
+                        <p className="text-xs text-slate-500 font-medium">{t.date}</p>
+                        {t.month && t.year && (
+                          <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                            Ref: {t.month}/{t.year}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-emerald-600">
+                    R$ {t.amount}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-slate-400 text-sm">Nenhum pagamento registrado.</p>
+              </div>
+            )}
+          </div>
+        </Card>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 function cn(...inputs: any[]) {
   return inputs.filter(Boolean).join(' ');

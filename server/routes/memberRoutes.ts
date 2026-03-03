@@ -4,6 +4,7 @@ import * as memberController from "../controllers/memberController";
 const router = Router();
 
 router.get("/", memberController.getMembers);
+router.get("/:id/stats", memberController.getMemberStats);
 router.post("/", memberController.createMember);
 router.patch("/:id/toggle-disconnected", memberController.toggleDisconnected);
 router.patch("/:id/toggle-pays", memberController.togglePays);

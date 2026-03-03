@@ -56,9 +56,21 @@ db.exec(`
     type TEXT CHECK(type IN ('income', 'expense')),
     category TEXT NOT NULL,
     member_id INTEGER,
+    month INTEGER,
+    year INTEGER,
     FOREIGN KEY (member_id) REFERENCES members(id)
   );
 `);
+
+try {
+  db.exec("ALTER TABLE transactions ADD COLUMN month INTEGER");
+  console.log("Migration: Added month to transactions table.");
+} catch (e) {}
+
+try {
+  db.exec("ALTER TABLE transactions ADD COLUMN year INTEGER");
+  console.log("Migration: Added year to transactions table.");
+} catch (e) {}
 
 try {
   db.exec("ALTER TABLE members ADD COLUMN payment_start_date TEXT");

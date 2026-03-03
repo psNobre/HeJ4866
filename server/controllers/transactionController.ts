@@ -12,9 +12,9 @@ export const getTransactions = (req: Request, res: Response) => {
 };
 
 export const createTransaction = (req: Request, res: Response) => {
-  const { date, description, amount, type, category, memberId } = req.body;
-  db.prepare("INSERT INTO transactions (date, description, amount, type, category, member_id) VALUES (?, ?, ?, ?, ?, ?)")
-    .run(date, description, amount, type, category, memberId || null);
+  const { date, description, amount, type, category, memberId, month, year } = req.body;
+  db.prepare("INSERT INTO transactions (date, description, amount, type, category, member_id, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+    .run(date, description, amount, type, category, memberId || null, month || null, year || null);
   res.json({ success: true });
 };
 

@@ -43,9 +43,10 @@ export const LoginForm = ({ onLogin }: { onLogin: (e: React.FormEvent<HTMLFormEl
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Palavra Semestral</label>
           <input 
-            name="palavraSemestral" 
+            name="palavraSemestral"
+            type="password" 
             required 
-            placeholder="Palavra do período"
+            placeholder="••••••••"
             className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-slate-900" 
           />
         </div>
@@ -53,12 +54,6 @@ export const LoginForm = ({ onLogin }: { onLogin: (e: React.FormEvent<HTMLFormEl
           Entrar
         </button>
       </form>
-      <div className="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Acesso de Teste:</p>
-        <p className="text-xs text-slate-500">CIM: <span className="font-bold">100001</span></p>
-        <p className="text-xs text-slate-500">Senha: <span className="font-bold">100001</span></p>
-        <p className="text-xs text-slate-500">Palavra: <span className="font-bold">Virtude</span></p>
-      </div>
       <p className="text-center text-xs text-slate-400 mt-8">
         Humildade e Justiça - Gestão Maçônica v1.0
       </p>

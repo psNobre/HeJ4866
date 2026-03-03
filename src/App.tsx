@@ -264,7 +264,7 @@ function App() {
 
         <div className="flex-1 overflow-y-auto p-8">
           <div className="max-w-6xl mx-auto">
-            {activeTab === 'dashboard' && <Dashboard stats={stats} transactions={transactions} sessions={sessions} />}
+            {activeTab === 'dashboard' && <Dashboard user={user} transactions={transactions} sessions={sessions} />}
             {activeTab === 'treasury' && <Treasury stats={stats} transactions={transactions} onAddTransaction={() => setShowTransactionModal(true)} />}
             {activeTab === 'attendance' && <Attendance sessions={sessions} onNewSession={() => setShowSessionModal(true)} />}
             {activeTab === 'members' && <Members members={members} transactions={transactions} onAddMember={() => { setEditingMember(null); setShowMemberModal(true); }} onEditMember={handleEditMember} onToggleDisconnected={handleToggleDisconnected} onTogglePays={handleTogglePays} />}

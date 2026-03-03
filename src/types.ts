@@ -46,6 +46,8 @@ export interface Transaction {
   category: TransactionCategory;
   memberId?: number;
   memberName?: string; // For UI convenience
+  month?: number;
+  year?: number;
 }
 
 export interface Session {

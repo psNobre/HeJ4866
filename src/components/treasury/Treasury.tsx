@@ -77,7 +77,14 @@ export const Treasury = ({
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-slate-700">{t.description}</span>
-                      {t.memberName && <span className="text-[10px] text-lodge-green font-bold uppercase tracking-wider">Obreiro: {t.memberName}</span>}
+                      <div className="flex items-center space-x-2 mt-0.5">
+                        {t.memberName && <span className="text-[10px] text-lodge-green font-bold uppercase tracking-wider">Obreiro: {t.memberName}</span>}
+                        {t.month && t.year && (
+                          <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                            Ref: {t.month}/{t.year}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </td>
