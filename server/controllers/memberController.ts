@@ -12,10 +12,17 @@ export const getMembers = (req: Request, res: Response) => {
       payment_start_date as paymentStartDate,
       pays_through_lodge as paysThroughLodge, 
       disconnected, active,
-      must_change_password as mustChangePassword
+      must_change_password as mustChangePassword,
+      permissions
     FROM members
   `).all();
-  res.json(members);
+  
+  const parsedMembers = members.map((m: any) => ({
+    ...m,
+    permissions: m.permissions ? JSON.parse(m.permissions) : []
+  }));
+  
+  res.json(parsedMembers);
 };
 
 export const createMember = (req: Request, res: Response) => {
@@ -71,9 +78,14 @@ export const updateProfile = (req: Request, res: Response) => {
         payment_start_date as paymentStartDate,
         pays_through_lodge as paysThroughLodge, 
         disconnected, active,
-        must_change_password as mustChangePassword
+        must_change_password as mustChangePassword,
+        permissions
       FROM members WHERE id = ?
     `).get(id);
+    
+    if (updatedUser) {
+      (updatedUser as any).permissions = (updatedUser as any).permissions ? JSON.parse((updatedUser as any).permissions) : [];
+    }
     
     res.json({ success: true, user: updatedUser });
   } catch (error: any) {
@@ -183,6 +195,17 @@ export const getMemberStats = (req: Request, res: Response) => {
       totalPayments: paidTransactions.length,
       requiredPayments: paidTransactions.length + missingMonths.length // This is a bit dynamic
     });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const updatePermissions = (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { permissions } = req.body;
+  try {
+    db.prepare("UPDATE members SET permissions = ? WHERE id = ?").run(JSON.stringify(permissions), id);
+    res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

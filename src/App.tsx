@@ -14,6 +14,7 @@ import { TransactionModal } from './components/treasury/TransactionModal';
 import { MemberModal } from './components/members/MemberModal';
 import { SessionModal } from './components/attendance/SessionModal';
 import { Profile } from './components/profile/Profile';
+import { AccessControl } from './components/access/AccessControl';
 
 function App() {
   const [user, setUser] = useState<Member | null>(null);
@@ -225,6 +226,19 @@ function App() {
     }
   };
 
+  const handleUpdatePermissions = async (memberId: number, permissions: string[]) => {
+    const res = await fetch(`/api/members/${memberId}/permissions`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ permissions })
+    });
+    if (res.ok) {
+      setMembers(prev => prev.map(m => m.id === memberId ? { ...m, permissions } : m));
+    } else {
+      throw new Error("Failed to update permissions");
+    }
+  };
+
   if (!user) {
     return (
       <>
@@ -269,6 +283,7 @@ function App() {
             {activeTab === 'attendance' && <Attendance sessions={sessions} onNewSession={() => setShowSessionModal(true)} />}
             {activeTab === 'members' && <Members members={members} transactions={transactions} onAddMember={() => { setEditingMember(null); setShowMemberModal(true); }} onEditMember={handleEditMember} onToggleDisconnected={handleToggleDisconnected} onTogglePays={handleTogglePays} />}
             {activeTab === 'settings' && <Settings palavraSemestral={palavraSemestral} onUpdatePalavra={handleUpdatePalavra} />}
+            {activeTab === 'access-control' && <AccessControl members={members} onUpdatePermissions={handleUpdatePermissions} />}
             {activeTab === 'profile' && <Profile user={user} onUpdateUser={setUser} />}
           </div>
         </div>

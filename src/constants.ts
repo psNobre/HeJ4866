@@ -6,5 +6,6 @@ export const TAB_LABELS: Record<Tab, string> = {
   attendance: 'Frequência',
   members: 'Obreiros',
   settings: 'Configurações',
-  profile: 'Meu Perfil'
+  profile: 'Meu Perfil',
+  'access-control': 'Controle de Acesso'
 };

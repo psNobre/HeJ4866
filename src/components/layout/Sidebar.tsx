@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Wallet, Calendar, Users, Settings as SettingsIcon, LogOut, UserCircle } from 'lucide-react';
+import { LayoutDashboard, Wallet, Calendar, Users, Settings as SettingsIcon, LogOut, UserCircle, ShieldCheck } from 'lucide-react';
 import { SidebarItem } from '../ui/SidebarItem';
 import { Tab, Member } from '../../types';
 import { TAB_LABELS } from '../../constants';
@@ -41,36 +41,52 @@ export const Sidebar = ({
       </div>
 
       <nav className="flex-1 space-y-1">
-        <SidebarItem 
-          icon={LayoutDashboard} 
-          label={TAB_LABELS.dashboard} 
-          active={activeTab === 'dashboard'} 
-          onClick={() => setActiveTab('dashboard')} 
-        />
-        <SidebarItem 
-          icon={Wallet} 
-          label={TAB_LABELS.treasury} 
-          active={activeTab === 'treasury'} 
-          onClick={() => setActiveTab('treasury')} 
-        />
-        <SidebarItem 
-          icon={Calendar} 
-          label={TAB_LABELS.attendance} 
-          active={activeTab === 'attendance'} 
-          onClick={() => setActiveTab('attendance')} 
-        />
-        <SidebarItem 
-          icon={Users} 
-          label={TAB_LABELS.members} 
-          active={activeTab === 'members'} 
-          onClick={() => setActiveTab('members')} 
-        />
-        {user.role === 'Venerável Mestre' && (
+        {user.permissions?.includes('dashboard') && (
+          <SidebarItem 
+            icon={LayoutDashboard} 
+            label={TAB_LABELS.dashboard} 
+            active={activeTab === 'dashboard'} 
+            onClick={() => setActiveTab('dashboard')} 
+          />
+        )}
+        {user.permissions?.includes('treasury') && (
+          <SidebarItem 
+            icon={Wallet} 
+            label={TAB_LABELS.treasury} 
+            active={activeTab === 'treasury'} 
+            onClick={() => setActiveTab('treasury')} 
+          />
+        )}
+        {user.permissions?.includes('attendance') && (
+          <SidebarItem 
+            icon={Calendar} 
+            label={TAB_LABELS.attendance} 
+            active={activeTab === 'attendance'} 
+            onClick={() => setActiveTab('attendance')} 
+          />
+        )}
+        {user.permissions?.includes('members') && (
+          <SidebarItem 
+            icon={Users} 
+            label={TAB_LABELS.members} 
+            active={activeTab === 'members'} 
+            onClick={() => setActiveTab('members')} 
+          />
+        )}
+        {user.permissions?.includes('settings') && (
           <SidebarItem 
             icon={SettingsIcon} 
             label={TAB_LABELS.settings} 
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
+          />
+        )}
+        {user.permissions?.includes('access-control') && (
+          <SidebarItem 
+            icon={ShieldCheck} 
+            label={TAB_LABELS['access-control']} 
+            active={activeTab === 'access-control'} 
+            onClick={() => setActiveTab('access-control')} 
           />
         )}
       </nav>

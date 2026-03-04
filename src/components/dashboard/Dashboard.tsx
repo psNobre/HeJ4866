@@ -74,7 +74,7 @@ export const Dashboard = ({ user, transactions, sessions }: {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 gap-10">
         <Card title="Meses em Aberto" subtitle="Mensalidades pendentes de pagamento">
           <div className="mt-8 space-y-4">
             {memberStats?.missingMonths && memberStats.missingMonths.length > 0 ? (
@@ -91,40 +91,6 @@ export const Dashboard = ({ user, transactions, sessions }: {
                 </div>
                 <p className="text-slate-900 font-bold">Tudo em dia!</p>
                 <p className="text-slate-500 text-sm mt-1">Você não possui mensalidades pendentes.</p>
-              </div>
-            )}
-          </div>
-        </Card>
-
-        <Card title="Seus Pagamentos Recentes" subtitle="Últimas mensalidades registradas">
-          <div className="space-y-6 mt-8">
-            {userTransactions.length > 0 ? (
-              userTransactions.slice(0, 5).map((t) => (
-                <div key={t.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-                      <Wallet size={18} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">{t.description}</p>
-                      <div className="flex items-center space-x-2">
-                        <p className="text-xs text-slate-500 font-medium">{t.date}</p>
-                        {t.month && t.year && (
-                          <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
-                            Ref: {t.month}/{t.year}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-emerald-600">
-                    R$ {t.amount}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-slate-400 text-sm">Nenhum pagamento registrado.</p>
               </div>
             )}
           </div>

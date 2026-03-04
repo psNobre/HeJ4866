@@ -31,7 +31,8 @@ export const login = (req: Request, res: Response) => {
       exaltation_date as exaltationDate, 
       pays_through_lodge as paysThroughLodge, 
       disconnected, active,
-      must_change_password as mustChangePassword
+      must_change_password as mustChangePassword,
+      permissions
     FROM members 
     WHERE cim = ?
   `).get(trimmedCim);
@@ -52,6 +53,13 @@ export const login = (req: Request, res: Response) => {
     
     // Don't send password back to client
     const { password: _, ...userWithoutPassword } = m;
+    if (userWithoutPassword.permissions) {
+      try {
+        userWithoutPassword.permissions = JSON.parse(userWithoutPassword.permissions);
+      } catch (e) {
+        userWithoutPassword.permissions = [];
+      }
+    }
     console.log(`Login successful for CIM ${trimmedCim} (${m.name})`);
     res.json({ success: true, user: userWithoutPassword });
   } else {

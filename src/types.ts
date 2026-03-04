@@ -12,6 +12,7 @@ export interface Member {
   disconnected: number;
   active: number;
   mustChangePassword: number;
+  permissions?: string[]; // Array of Tab strings
 }
 
 export type TransactionCategory = 
@@ -67,4 +68,4 @@ export interface Stats {
   lastAttendanceRate: number;
 }
 
-export type Tab = 'dashboard' | 'treasury' | 'attendance' | 'members' | 'settings' | 'profile';
+export type Tab = 'dashboard' | 'treasury' | 'attendance' | 'members' | 'settings' | 'profile' | 'access-control';
