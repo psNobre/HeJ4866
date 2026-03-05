@@ -53,13 +53,13 @@ export const Profile = ({ user, onUpdateUser }: ProfileProps) => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
-      <div className="flex items-center space-x-4 mb-8">
-        <div className="w-16 h-16 bg-lodge-green/10 rounded-2xl flex items-center justify-center text-lodge-green">
+      <div className="flex-items-center space-x-4 mb-8">
+        <div className="icon-box bg-slate-100 text-zinc-950">
           <User size={32} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Meu Perfil</h1>
-          <p className="text-slate-500">Gerencie suas informações pessoais</p>
+          <h1 className="heading-display">Meu Perfil</h1>
+          <p className="text-muted">Gerencie suas informações pessoais</p>
         </div>
       </div>
 
@@ -67,25 +67,25 @@ export const Profile = ({ user, onUpdateUser }: ProfileProps) => {
         <Card title="Informações Pessoais">
           <div className="space-y-4 mt-6">
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">CIM (Não alterável)</label>
+              <label className="label-base">CIM (Não alterável)</label>
               <input 
                 type="text" 
                 value={user.cim} 
                 disabled 
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed"
+                className="input-base bg-slate-50 text-slate-500 cursor-not-allowed"
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Nome Completo</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <label className="label-base">Nome Completo</label>
+              <div className="input-icon-wrapper">
+                <User className="input-icon" size={18} />
                 <input 
-                  type="text" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
-                />
+                   type="text" 
+                   value={name}
+                   onChange={(e) => setName(e.target.value)}
+                   required
+                   className="input-with-icon"
+                 />
               </div>
             </div>
           </div>
@@ -93,36 +93,36 @@ export const Profile = ({ user, onUpdateUser }: ProfileProps) => {
 
         <Card title="Segurança">
           <div className="space-y-4 mt-6">
-            <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl flex items-start space-x-3">
-              <AlertCircle className="text-amber-600 shrink-0 mt-0.5" size={18} />
+            <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl flex-items-center space-x-3">
+              <AlertCircle className="text-amber-600 shrink-0" size={18} />
               <p className="text-sm text-amber-800">
                 Deixe os campos de senha em branco se não desejar alterá-la.
               </p>
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Nova Senha</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <label className="label-base">Nova Senha</label>
+              <div className="input-icon-wrapper">
+                <Lock className="input-icon" size={18} />
                 <input 
                   type="password" 
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Mínimo 6 caracteres"
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                  className="input-with-icon"
                 />
               </div>
             </div>
             
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Confirmar Nova Senha</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <label className="label-base">Confirmar Nova Senha</label>
+              <div className="input-icon-wrapper">
+                <Lock className="input-icon" size={18} />
                 <input 
                   type="password" 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                  className="input-with-icon"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export const Profile = ({ user, onUpdateUser }: ProfileProps) => {
           <button 
             type="submit"
             disabled={isUpdating}
-            className="flex items-center space-x-2 px-8 py-4 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark hover:scale-105 transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold disabled:opacity-50 disabled:scale-100"
+            className="btn-primary"
           >
             <Save size={20} />
             <span>{isUpdating ? 'Salvando...' : 'Salvar Alterações'}</span>

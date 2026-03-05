@@ -46,7 +46,6 @@ export function initDB() {
 
     // Seed initial members if empty
     const memberCount = db.prepare("SELECT COUNT(*) as count FROM members").get() as { count: number };
-    console.log(`Database check. Current member count: ${memberCount.count}`);
 
     if (memberCount.count === 0) {
       console.log("Seeding initial members...");
@@ -92,7 +91,7 @@ export function initDB() {
       console.log("Seed data inserted successfully.");
 
       // Seed Sessions
-      console.log("Seeding sessions...");
+      console.log(`Seeding ${sessionsData.length} sessions...`);
       const insertSession = db.prepare(`
         INSERT INTO sessions (date, title, type, degree, description) 
         VALUES (?, ?, ?, ?, ?)
@@ -103,9 +102,9 @@ export function initDB() {
       }
 
       // Seed Attendance
-      console.log("Seeding attendance...");
+      console.log(`Seeding ${attendanceData.length} attendance records...`);
       const insertAttendance = db.prepare(`
-        INSERT INTO attendance (session_id, member_id, present) 
+        INSERT OR IGNORE INTO attendance (session_id, member_id, present) 
         VALUES (?, ?, ?)
       `);
 
@@ -113,7 +112,11 @@ export function initDB() {
         const member = db.prepare("SELECT id FROM members WHERE name = ?").get(a[0]) as { id: number } | undefined;
         const session = db.prepare("SELECT id FROM sessions WHERE title = ?").get(a[1]) as { id: number } | undefined;
         if (member && session) {
-          insertAttendance.run(session.id, member.id, 1);
+          try {
+            insertAttendance.run(session.id, member.id, 1);
+          } catch (err) {
+            // Ignore duplicates
+          }
         }
       }
       console.log("Sessions and attendance seeded successfully.");
@@ -136,28 +139,36 @@ export function initDB() {
       `);
 
       const insertAttendance = db.prepare(`
-        INSERT INTO attendance (session_id, member_id, present) 
+        INSERT OR IGNORE INTO attendance (session_id, member_id, present) 
         VALUES (?, ?, ?)
       `);
 
+      let sessionsAdded = 0;
       for (const s of sessionsData) {
         const exists = db.prepare("SELECT id FROM sessions WHERE title = ?").get(s[1]);
         if (!exists) {
           insertSession.run(s[0], s[1], s[2], s[3], s[4]);
-          console.log(`Migration: Added missing session ${s[1]}`);
+          sessionsAdded++;
         }
       }
+      if (sessionsAdded > 0) console.log(`Migration: Added ${sessionsAdded} missing sessions.`);
 
+      let attendanceAdded = 0;
       for (const a of attendanceData) {
         const member = db.prepare("SELECT id FROM members WHERE name = ?").get(a[0]) as { id: number } | undefined;
         const session = db.prepare("SELECT id FROM sessions WHERE title = ?").get(a[1]) as { id: number } | undefined;
         if (member && session) {
-          const exists = db.prepare("SELECT * FROM attendance WHERE session_id = ? AND member_id = ?").get(session.id, member.id);
-          if (!exists) {
-            insertAttendance.run(session.id, member.id, 1);
+          try {
+            const info = insertAttendance.run(session.id, member.id, 1);
+            if (info.changes > 0) {
+              attendanceAdded++;
+            }
+          } catch (err) {
+            // Ignore duplicates
           }
         }
       }
+      if (attendanceAdded > 0) console.log(`Migration: Added ${attendanceAdded} missing attendance records.`);
       console.log("Sessions and attendance migration check completed.");
 
       // Migration: Add missing members (Leonardo and Sandro) if they don't exist

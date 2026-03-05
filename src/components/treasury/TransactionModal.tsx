@@ -22,54 +22,54 @@ export const TransactionModal = ({
   const [selectedCategory, setSelectedCategory] = useState<TransactionCategory>('Mensalidade');
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
-      <Card className="w-full max-w-lg relative z-10" title="Nova Movimentação" subtitle="Registre uma entrada ou saída de caixa">
+    <div className="modal-container">
+      <div className="modal-overlay" onClick={onClose} />
+      <Card className="w-full max-w-lg relative z-10 max-h-full overflow-y-auto" title="Nova Movimentação" subtitle="Registre uma entrada ou saída de caixa">
         <button onClick={onClose} className="absolute top-8 right-8 p-2 hover:bg-slate-50 rounded-xl transition-all">
           <X size={20} className="text-slate-400" />
         </button>
         <form onSubmit={onSubmit} className="space-y-6 mt-10">
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Tipo</label>
-              <select name="type" className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all">
+              <label className="label-base">Tipo</label>
+              <select name="type" className="input-base">
                 <option value="income">Entrada</option>
                 <option value="expense">Saída</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Valor (R$)</label>
-              <input name="amount" type="number" step="0.01" required className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" />
+              <label className="label-base">Valor (R$)</label>
+              <input name="amount" type="number" step="0.01" required className="input-base" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Descrição</label>
-            <input name="description" required className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" />
+            <label className="label-base">Descrição</label>
+            <input name="description" required className="input-base" />
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Categoria</label>
+              <label className="label-base">Categoria</label>
               <select 
                 name="category" 
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value as TransactionCategory)}
                 required 
-                className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                className="input-base"
               >
                 {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Data</label>
-              <input name="date" type="date" defaultValue={new Date().toISOString().split('T')[0]} required className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" />
+              <label className="label-base">Data</label>
+              <input name="date" type="date" defaultValue={new Date().toISOString().split('T')[0]} required className="input-base" />
             </div>
           </div>
 
           {selectedCategory === 'Mensalidade' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Obreiro</label>
-                <select name="memberId" required className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all">
+                <label className="label-base">Obreiro</label>
+                <select name="memberId" required className="input-base">
                   <option value="">Selecione um obreiro...</option>
                   {members.filter(m => m.active && !m.disconnected).map(m => (
                     <option key={m.id} value={m.id}>{m.name} (CIM: {m.cim})</option>
@@ -78,12 +78,12 @@ export const TransactionModal = ({
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Mês Referente</label>
+                  <label className="label-base">Mês Referente</label>
                   <select 
                     name="month" 
                     required 
                     defaultValue={new Date().getMonth() + 1}
-                    className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                    className="input-base"
                   >
                     <option value="1">Janeiro</option>
                     <option value="2">Fevereiro</option>
@@ -100,12 +100,12 @@ export const TransactionModal = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Ano Referente</label>
+                  <label className="label-base">Ano Referente</label>
                   <select 
                     name="year" 
                     required 
                     defaultValue={new Date().getFullYear()}
-                    className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+                    className="input-base"
                   >
                     {[2024, 2025, 2026, 2027].map(y => (
                       <option key={y} value={y}>{y}</option>
@@ -116,7 +116,7 @@ export const TransactionModal = ({
             </div>
           )}
 
-          <button type="submit" className="w-full py-5 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold">
+          <button type="submit" className="btn-primary w-full justify-center">
             Salvar Movimentação
           </button>
         </form>

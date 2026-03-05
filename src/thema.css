@@ -1,0 +1,139 @@
+@layer components {
+  /* Layout Containers */
+  .page-container {
+    @apply min-h-screen bg-slate-50/50 p-4 md:p-8 pb-24 md:pb-8;
+  }
+
+  .content-wrapper {
+    @apply max-w-7xl mx-auto space-y-8;
+  }
+
+  /* Flex & Grid Helpers */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .flex-items-center {
+    @apply flex items-center;
+  }
+
+  .grid-cols-2-responsive {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+  }
+
+  .grid-cols-3-responsive {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+  }
+
+  .grid-cols-4-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6;
+  }
+
+  /* Cards */
+  .card-base {
+    @apply bg-white rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden;
+  }
+
+  .card-header {
+    @apply p-8 border-b border-slate-100;
+  }
+
+  .card-content {
+    @apply p-8;
+  }
+
+  /* Buttons */
+  .btn-base {
+    @apply px-6 py-3 rounded-2xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98];
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 rounded-2xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] bg-zinc-950 text-white hover:bg-zinc-800 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-2xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] bg-white border border-slate-200 text-slate-600 hover:bg-slate-50;
+  }
+
+  .btn-ghost {
+    @apply p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-400 hover:text-slate-600;
+  }
+
+  .btn-danger {
+    @apply px-6 py-3 rounded-2xl font-medium transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] bg-red-50 text-red-600 hover:bg-red-100 border border-red-100;
+  }
+
+  /* Inputs */
+  .input-base {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 focus:border-zinc-950 transition-all bg-white placeholder:text-slate-400;
+  }
+
+  .label-base {
+    @apply block text-sm font-medium text-slate-700 mb-1.5 ml-1;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    @apply absolute inset-0 bg-zinc-950/40 backdrop-blur-sm;
+  }
+
+  .modal-container {
+    @apply fixed inset-0 z-[100] flex items-center justify-center p-4;
+  }
+
+  /* Badges */
+  .badge-base {
+    @apply px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  /* Icons & Boxes */
+  .icon-box {
+    @apply w-12 h-12 rounded-2xl flex items-center justify-center shrink-0;
+  }
+
+  /* Typography */
+  .heading-display {
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-slate-900;
+  }
+
+  .text-muted {
+    @apply text-slate-500;
+  }
+
+  .text-xs-bold-uppercase {
+    @apply text-xs font-bold uppercase tracking-wider;
+  }
+
+  /* Tables & Lists */
+  .table-row-hover {
+    @apply hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-100 last:border-0;
+  }
+
+  .list-item-base {
+    @apply flex items-center justify-between p-4 rounded-2xl border border-slate-100 bg-white hover:bg-slate-50 transition-all;
+  }
+
+  .list-item-content {
+    @apply flex items-center space-x-4 p-4 rounded-2xl border border-slate-100 bg-white;
+  }
+
+  .badge-pill {
+    @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider;
+  }
+
+  .input-icon-wrapper {
+    @apply relative;
+  }
+
+  .input-icon {
+    @apply absolute left-4 top-1/2 -translate-y-1/2 text-slate-400;
+  }
+
+  .input-with-icon {
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-zinc-950/5 focus:border-zinc-950 transition-all bg-white placeholder:text-slate-400 pl-12;
+  }
+}

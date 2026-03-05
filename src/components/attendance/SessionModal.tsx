@@ -47,10 +47,10 @@ export const SessionModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+    <div className="modal-container">
+      <div className="modal-overlay" onClick={onClose} />
       <Card 
-        className="w-full max-w-3xl relative z-10" 
+        className="w-full max-w-3xl relative z-10 max-h-full overflow-y-auto" 
         title={session ? "Editar Sessão" : "Nova Sessão"} 
         subtitle={session ? "Atualize os dados e presenças da sessão" : "Registro de presença e ata da sessão"}
       >
@@ -66,22 +66,22 @@ export const SessionModal = ({
           <form onSubmit={onSubmit} className="space-y-8 mt-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Título da Sessão</label>
+                <label className="label-base">Título da Sessão</label>
                 <input 
                   name="title" 
                   required 
                   defaultValue={session?.title}
                   placeholder="Ex: Sessão de Instrução" 
-                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+                  className="input-base" 
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Tipo de Sessão</label>
+                <label className="label-base">Tipo de Sessão</label>
                 <select 
                   name="type" 
                   required 
                   defaultValue={session?.type || "Ordinária"}
-                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all appearance-none"
+                  className="input-base"
                 >
                   <option value="Ordinária">Ordinária</option>
                   <option value="Magna">Magna</option>
@@ -90,12 +90,12 @@ export const SessionModal = ({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Grau da Sessão</label>
+                <label className="label-base">Grau da Sessão</label>
                 <select 
                   name="degree" 
                   required 
                   defaultValue={session?.degree || "Aprendiz"}
-                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all appearance-none"
+                  className="input-base"
                 >
                   <option value="Aprendiz">Aprendiz</option>
                   <option value="Companheiro">Companheiro</option>
@@ -104,28 +104,28 @@ export const SessionModal = ({
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Data</label>
+                <label className="label-base">Data</label>
                 <input 
                   name="date" 
                   type="date" 
                   defaultValue={session?.date || new Date().toISOString().split('T')[0]} 
                   required 
-                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+                  className="input-base" 
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Descrição (Opcional)</label>
+                <label className="label-base">Descrição (Opcional)</label>
                 <input 
                   name="description" 
                   defaultValue={session?.description}
                   placeholder="Contexto adicional..." 
-                  className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+                  className="input-base" 
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 ml-1">Lista de Presença</label>
+              <label className="label-base">Lista de Presença</label>
               <div className="max-h-[300px] overflow-y-auto pr-4 space-y-3 custom-scrollbar">
                 {members
                   .filter(m => !m.disconnected || (session && attendance[m.id] !== undefined))
@@ -152,7 +152,7 @@ export const SessionModal = ({
               </div>
             </div>
 
-            <button type="submit" className="w-full py-5 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold">
+            <button type="submit" className="btn-primary w-full justify-center">
               {session ? "Salvar Alterações" : "Finalizar Sessão e Salvar Ata"}
             </button>
           </form>

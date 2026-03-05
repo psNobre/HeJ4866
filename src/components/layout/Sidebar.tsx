@@ -19,7 +19,7 @@ export const Sidebar = ({
   onLogout: () => void;
 }) => (
   <aside className={cn(
-    "fixed inset-y-0 left-0 z-50 w-64 bg-lodge-dark text-white transition-transform duration-300 lg:relative lg:translate-x-0 border-r border-lodge-gold/20",
+    "fixed inset-y-0 left-0 z-50 w-64 bg-zinc-950 text-white transition-transform duration-300 lg:relative lg:translate-x-0 border-r border-white/5",
     !isSidebarOpen && "-translate-x-full"
   )}>
     <div className="p-6 flex flex-col h-full">
@@ -36,7 +36,7 @@ export const Sidebar = ({
         </div>
         <div>
           <h1 className="text-sm font-bold tracking-tight leading-tight">Humildade e Justiça</h1>
-          <p className="text-[9px] text-lodge-gold uppercase tracking-widest font-bold">Nº 4866</p>
+          <p className="text-[9px] text-amber-400 uppercase tracking-widest font-bold">Nº 4866</p>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export const Sidebar = ({
           onClick={() => setActiveTab('profile')}
           className={cn(
             "w-full flex items-center space-x-3 px-4 py-3.5 rounded-2xl transition-all duration-200",
-            activeTab === 'profile' ? "bg-lodge-gold text-lodge-dark font-bold" : "text-slate-400 hover:bg-white/5"
+            activeTab === 'profile' ? "bg-amber-400 text-black font-bold" : "text-slate-400 hover:bg-white/5"
           )}
         >
           <UserCircle size={20} />

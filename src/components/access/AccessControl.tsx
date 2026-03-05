@@ -4,6 +4,7 @@ import { Member, Tab } from '../../types';
 import { Card } from '../ui/Card';
 import { TAB_LABELS } from '../../constants';
 import { toast } from 'sonner';
+import { cn } from '../../lib/utils';
 
 interface AccessControlProps {
   members: Member[];
@@ -42,7 +43,7 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid-cols-3-responsive gap-8">
         {/* Member List */}
         <div className="lg:col-span-1">
           <Card title="Obreiros" subtitle="Selecione um obreiro para gerenciar">
@@ -51,22 +52,25 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
                 <button
                   key={member.id}
                   onClick={() => setSelectedMemberId(member.id)}
-                  className={`w-full flex items-center p-4 rounded-2xl transition-all ${
+                  className={cn(
+                    "w-full flex-items-center p-4 rounded-2xl transition-all",
                     selectedMemberId === member.id 
-                      ? 'bg-lodge-green text-white shadow-lg shadow-lodge-green/20' 
+                      ? 'bg-zinc-950 text-white shadow-lg shadow-zinc-950/20' 
                       : 'bg-white hover:bg-slate-50 border border-slate-100'
-                  }`}
+                  )}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                  <div className={cn(
+                    "icon-box w-10 h-10 rounded-xl",
                     selectedMemberId === member.id ? 'bg-white/20' : 'bg-slate-100 text-slate-500'
-                  }`}>
+                  )}>
                     <Users size={20} />
                   </div>
                   <div className="ml-4 text-left min-w-0">
                     <p className="text-sm font-bold truncate">{member.name}</p>
-                    <p className={`text-[10px] uppercase tracking-wider font-bold ${
+                    <p className={cn(
+                      "text-xs-bold-uppercase",
                       selectedMemberId === member.id ? 'text-white/70' : 'text-slate-400'
-                    }`}>
+                    )}>
                       {member.role || member.degree}
                     </p>
                   </div>
@@ -91,23 +95,26 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
                       key={tab}
                       disabled={loading}
                       onClick={() => handleTogglePermission(tab)}
-                      className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all ${
+                      className={cn(
+                        "flex-between p-5 rounded-2xl border-2 transition-all",
                         hasAccess 
-                          ? 'border-lodge-green bg-lodge-green/5 text-lodge-green' 
+                          ? 'border-zinc-950 bg-zinc-950/5 text-zinc-950' 
                           : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-200'
-                      }`}
+                      )}
                     >
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          hasAccess ? 'bg-lodge-green text-white' : 'bg-slate-200 text-slate-500'
-                        }`}>
+                      <div className="flex-items-center space-x-4">
+                        <div className={cn(
+                          "icon-box w-10 h-10 rounded-xl",
+                          hasAccess ? 'bg-zinc-950 text-white' : 'bg-slate-200 text-slate-500'
+                        )}>
                           {hasAccess ? <Check size={20} /> : <Lock size={20} />}
                         </div>
                         <span className="font-bold text-sm">{TAB_LABELS[tab]}</span>
                       </div>
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        hasAccess ? 'bg-lodge-green text-white' : 'bg-slate-200 text-slate-500'
-                      }`}>
+                      <div className={cn(
+                        "w-6 h-6 rounded-full flex-center",
+                        hasAccess ? 'bg-zinc-950 text-white' : 'bg-slate-200 text-slate-500'
+                      )}>
                         {hasAccess ? <Check size={14} /> : <X size={14} />}
                       </div>
                     </button>
@@ -115,8 +122,8 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
                 })}
               </div>
               
-              <div className="mt-10 p-6 bg-blue-50 rounded-3xl border border-blue-100 flex items-start space-x-4">
-                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
+              <div className="mt-10 p-6 bg-blue-50 rounded-3xl border border-blue-100 flex-items-center space-x-4">
+                <div className="icon-box bg-blue-100 text-blue-600">
                   <Shield size={24} />
                 </div>
                 <div>
@@ -128,7 +135,7 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
               </div>
             </Card>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center p-12 bg-white rounded-[40px] border-2 border-dashed border-slate-200 text-slate-400">
+            <div className="h-full flex-center flex-col p-12 bg-white rounded-[40px] border-2 border-dashed border-slate-200 text-slate-400">
               <Users size={48} className="mb-4 opacity-20" />
               <p className="font-bold">Selecione um obreiro à esquerda</p>
               <p className="text-sm">para gerenciar suas permissões de acesso</p>

@@ -12,10 +12,10 @@ export const MemberModal = ({
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   member?: Member | null;
 }) => (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+  <div className="modal-container">
+    <div className="modal-overlay" onClick={onClose} />
     <Card 
-      className="w-full max-w-2xl relative z-10" 
+      className="w-full max-w-2xl relative z-10 max-h-full overflow-y-auto" 
       title={member ? "Editar Obreiro" : "Novo Obreiro"} 
       subtitle={member ? `Editando informações de ${member.name}` : "Cadastrar novo membro no quadro da Loja"}
     >
@@ -25,29 +25,29 @@ export const MemberModal = ({
       <form onSubmit={onSubmit} className="space-y-6 mt-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Nome Completo</label>
+            <label className="label-base">Nome Completo</label>
             <input 
               name="name" 
               required 
               defaultValue={member?.name}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">CIM</label>
+            <label className="label-base">CIM</label>
             <input 
               name="cim" 
               required 
               defaultValue={member?.cim}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Grau</label>
+            <label className="label-base">Grau</label>
             <select 
               name="degree" 
               defaultValue={member?.degree || "Aprendiz"}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all"
+              className="input-base"
             >
               <option value="Aprendiz">Aprendiz</option>
               <option value="Companheiro">Companheiro</option>
@@ -56,48 +56,48 @@ export const MemberModal = ({
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Cargo</label>
+            <label className="label-base">Cargo</label>
             <input 
               name="role" 
               defaultValue={member?.role || ""}
               placeholder="Ex: Orador, Secretário..." 
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Data de Iniciação</label>
+            <label className="label-base">Data de Iniciação</label>
             <input 
               name="initiationDate" 
               type="date" 
               defaultValue={member?.initiationDate || ""}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Data de Elevação</label>
+            <label className="label-base">Data de Elevação</label>
             <input 
               name="elevationDate" 
               type="date" 
               defaultValue={member?.elevationDate || ""}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Data de Exaltação</label>
+            <label className="label-base">Data de Exaltação</label>
             <input 
               name="exaltationDate" 
               type="date" 
               defaultValue={member?.exaltationDate || ""}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Início de Recolhimento</label>
+            <label className="label-base">Início de Recolhimento</label>
             <input 
               name="paymentStartDate" 
               type="date" 
               defaultValue={member?.paymentStartDate || ""}
-              className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all" 
+              className="input-base" 
             />
           </div>
           <div className="flex items-center space-x-4 h-full pt-6">
@@ -130,7 +130,7 @@ export const MemberModal = ({
             </label>
           </div>
         </div>
-        <button type="submit" className="w-full py-5 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold">
+        <button type="submit" className="btn-primary w-full justify-center">
           {member ? "Salvar Alterações" : "Cadastrar Obreiro"}
         </button>
       </form>

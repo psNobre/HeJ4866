@@ -35,10 +35,10 @@ export const ViewAttendanceModal = ({
   const absentMembers = attendance.filter(a => a.present === 0);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+    <div className="modal-container">
+      <div className="modal-overlay" onClick={onClose} />
       <Card 
-        className="w-full max-w-2xl relative z-10" 
+        className="w-full max-w-2xl relative z-10 max-h-full overflow-y-auto" 
         title={`Presenças: ${session.title}`} 
         subtitle={`${session.date} • ${session.type} • ${session.degree}`}
       >

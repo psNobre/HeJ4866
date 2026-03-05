@@ -48,12 +48,12 @@ export const Dashboard = ({ user, transactions, sessions }: {
 
   return (
     <div className="space-y-10">
-      <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">Olá, {user.name}</h1>
-        <p className="text-slate-500 mt-2">Bem-vindo ao seu painel pessoal. Aqui você pode acompanhar sua situação na Loja.</p>
+      <div className="card-base card-content">
+        <h1 className="heading-display">Olá, {user.name}</h1>
+        <p className="text-muted mt-2">Bem-vindo ao seu painel pessoal. Aqui você pode acompanhar sua situação na Loja.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid-cols-3-responsive">
         <StatCard 
           title="Sua Frequência" 
           value={`${memberStats?.attendanceRate || 0}%`} 
@@ -79,14 +79,16 @@ export const Dashboard = ({ user, transactions, sessions }: {
           <div className="mt-8 space-y-4">
             {memberStats?.missingMonths && memberStats.missingMonths.length > 0 ? (
               memberStats.missingMonths.map((month, idx) => (
-                <div key={idx} className="flex items-center space-x-4 p-4 bg-rose-50 rounded-2xl border border-rose-100">
-                  <Clock className="text-rose-600" size={20} />
-                  <span className="text-sm font-bold text-rose-900">{month}</span>
+                <div key={idx} className="list-item-base bg-rose-50 border-rose-100">
+                  <div className="flex-items-center space-x-4">
+                    <Clock className="text-rose-600" size={20} />
+                    <span className="text-sm font-bold text-rose-900">{month}</span>
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+              <div className="flex-center flex-col py-12 text-center">
+                <div className="icon-box bg-emerald-50 rounded-full mb-4">
                   <CheckCircle2 className="text-emerald-600" size={32} />
                 </div>
                 <p className="text-slate-900 font-bold">Tudo em dia!</p>

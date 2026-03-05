@@ -36,8 +36,8 @@ export const Header = ({
       <div className="h-8 w-px bg-slate-200 mx-2" />
       <div className="flex items-center space-x-4">
         <div className="text-right hidden sm:block">
-          <p className="text-xs font-bold text-lodge-green">A.R.L.S. Humildade e Justiça</p>
-          <p className="text-[10px] text-lodge-gold uppercase font-bold tracking-wider">Nº 4866</p>
+          <p className="text-xs font-bold text-slate-900">A.R.L.S. Humildade e Justiça</p>
+          <p className="text-[10px] text-amber-500 uppercase font-bold tracking-wider">Nº 4866</p>
         </div>
       </div>
     </div>

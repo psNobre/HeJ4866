@@ -12,8 +12,8 @@ export const Settings = ({
   <div className="max-w-2xl space-y-10">
     <Card title="Configurações do Sistema" subtitle="Administração de parâmetros da Loja">
       <form onSubmit={onUpdatePalavra} className="space-y-8 mt-10">
-        <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 flex items-start space-x-4">
-          <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center shrink-0">
+        <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 flex-items-center space-x-4">
+          <div className="icon-box bg-amber-100 text-amber-600">
             <Shield size={24} />
           </div>
           <div>
@@ -23,7 +23,7 @@ export const Settings = ({
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 ml-1">Palavra Semestral Atual</label>
+          <label className="label-base">Palavra Semestral Atual</label>
           <div className="relative">
             <Key className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input 
@@ -32,13 +32,13 @@ export const Settings = ({
               defaultValue={palavraSemestral}
               onFocus={(e) => { if (e.target.value === '********') e.target.value = ''; }}
               onBlur={(e) => { if (e.target.value === '') e.target.value = '********'; }}
-              className="w-full pl-14 pr-6 py-4 bg-slate-50 rounded-2xl border border-slate-100 focus:bg-white focus:ring-4 focus:ring-lodge-green/5 focus:border-lodge-green outline-none transition-all font-bold text-slate-900"
+              className="input-base pl-14 font-bold"
             />
           </div>
           <p className="text-[10px] text-slate-400 mt-2 ml-1">Para manter a palavra atual, deixe o campo como está.</p>
         </div>
 
-        <button type="submit" className="w-full py-4 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold">
+        <button type="submit" className="btn-primary w-full justify-center">
           Atualizar Parâmetros
         </button>
       </form>

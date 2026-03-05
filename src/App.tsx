@@ -359,8 +359,8 @@ function App() {
           user={user} 
         />
 
-        <div className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="page-container overflow-y-auto">
+          <div className="content-wrapper">
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               
