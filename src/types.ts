@@ -12,6 +12,7 @@ export interface Member {
   disconnected: number;
   active: number;
   mustChangePassword: number;
+  frequencyExempt: number;
   permissions?: string[]; // Array of Tab strings
 }
 
@@ -56,8 +57,20 @@ export interface Session {
   date: string;
   title: string;
   type: 'Ordinária' | 'Magna' | 'Pública' | 'Administrativa';
-  degree: 'Aprendiz' | 'Companheiro' | 'Mestre';
+  degree: 'Aprendiz' | 'Companheiro' | 'Mestre' | 'Pública';
   description?: string;
+  presentCount?: number;
+  totalCount?: number;
+}
+
+export interface MemberAttendanceStats {
+  id: number;
+  name: string;
+  degree: string;
+  presences: number;
+  absences: number;
+  totalSessions: number;
+  frequencyExempt?: number;
 }
 
 export interface Stats {

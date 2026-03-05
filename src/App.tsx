@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Member, Transaction, Session, Stats, Tab } from './types';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
@@ -15,6 +16,7 @@ import { MemberModal } from './components/members/MemberModal';
 import { SessionModal } from './components/attendance/SessionModal';
 import { Profile } from './components/profile/Profile';
 import { AccessControl } from './components/access/AccessControl';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 function App() {
   const [user, setUser] = useState<Member | null>(null);
@@ -30,6 +32,10 @@ function App() {
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showSessionModal, setShowSessionModal] = useState(false);
+  const [editingSession, setEditingSession] = useState<Session | null>(null);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
@@ -37,6 +43,24 @@ function App() {
       fetchSettings();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      const path = location.pathname.replace('/', '') as Tab;
+      const validTabs: Tab[] = ['dashboard', 'treasury', 'attendance', 'members', 'settings', 'profile', 'access-control'];
+      if (path && validTabs.includes(path)) {
+        setActiveTab(path);
+      } else if (location.pathname === '/') {
+        setActiveTab('dashboard');
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [location, user, navigate]);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    navigate(`/${tab}`);
+  };
 
   const fetchData = async () => {
     try {
@@ -129,6 +153,7 @@ function App() {
     const data = Object.fromEntries(formData);
     data.paysThroughLodge = data.paysThroughLodge === 'on' ? '1' : '0';
     data.disconnected = data.disconnected === 'on' ? '1' : '0';
+    data.frequencyExempt = data.frequencyExempt === 'on' ? '1' : '0';
     
     const url = editingMember ? `/api/members/${editingMember.id}` : '/api/members';
     const method = editingMember ? 'PUT' : 'POST';
@@ -159,11 +184,19 @@ function App() {
     const attendance: Record<string, boolean> = {};
     
     members.forEach(m => {
-      attendance[m.id] = formData.get(`attendance_${m.id}`) === 'on';
+      const val = formData.get(`attendance_${m.id}`);
+      attendance[m.id] = val === 'on';
     });
 
-    const res = await fetch('/api/sessions', {
-      method: 'POST',
+    const url = editingSession ? `/api/sessions/${editingSession.id}` : '/api/sessions';
+    const method = editingSession ? 'PUT' : 'POST';
+
+    if (editingSession && !window.confirm("Deseja salvar as alterações nesta sessão?")) {
+      return;
+    }
+
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         date: formData.get('date'),
@@ -176,11 +209,51 @@ function App() {
     });
     if (res.ok) {
       setShowSessionModal(false);
+      setEditingSession(null);
       fetchData();
-      toast.success("Sessão registrada com sucesso!");
+      toast.success(editingSession ? "Sessão atualizada com sucesso!" : "Sessão registrada com sucesso!");
     } else {
-      toast.error("Erro ao registrar sessão.");
+      toast.error(editingSession ? "Erro ao atualizar sessão." : "Erro ao registrar sessão.");
     }
+  };
+
+  const handleEditSession = (session: Session) => {
+    setEditingSession(session);
+    setShowSessionModal(true);
+  };
+
+  const handleDeleteSession = async (id: number) => {
+    // Usando toast para confirmação, evitando bloqueios de iframe do window.confirm
+    toast("Deseja realmente excluir esta sessão?", {
+      description: "Esta ação não pode ser desfeita.",
+      action: {
+        label: "Confirmar Exclusão",
+        onClick: async () => {
+          toast.loading("Excluindo sessão...", { id: "delete-session" });
+          try {
+            const res = await fetch(`/api/sessions/${id}`, { 
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (res.ok) {
+              await fetchData();
+              toast.success("Sessão excluída com sucesso!", { id: "delete-session" });
+            } else {
+              const errorData = await res.json();
+              toast.error(errorData.error || "Erro ao excluir sessão.", { id: "delete-session" });
+            }
+          } catch (error) {
+            console.error("Erro ao excluir sessão:", error);
+            toast.error("Erro de conexão ao excluir sessão.", { id: "delete-session" });
+          }
+        },
+      },
+      cancel: {
+        label: "Cancelar",
+        onClick: () => console.log("Exclusão cancelada"),
+      },
+    });
   };
 
   const handleToggleDisconnected = async (id: number) => {
@@ -200,6 +273,16 @@ function App() {
       toast.success("Configuração de pagamento atualizada!");
     } else {
       toast.error("Erro ao atualizar configuração.");
+    }
+  };
+
+  const handleToggleFrequencyExempt = async (id: number) => {
+    const res = await fetch(`/api/members/${id}/toggle-frequency-exempt`, { method: 'PATCH' });
+    if (res.ok) {
+      fetchData();
+      toast.success("Abono de frequência atualizado!");
+    } else {
+      toast.error("Erro ao atualizar abono.");
     }
   };
 
@@ -262,7 +345,7 @@ function App() {
       <Toaster position="top-right" richColors />
       <Sidebar 
         activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
+        setActiveTab={handleTabChange} 
         isSidebarOpen={isSidebarOpen} 
         user={user} 
         onLogout={() => setUser(null)} 
@@ -278,20 +361,73 @@ function App() {
 
         <div className="flex-1 overflow-y-auto p-8">
           <div className="max-w-6xl mx-auto">
-            {activeTab === 'dashboard' && <Dashboard user={user} transactions={transactions} sessions={sessions} />}
-            {activeTab === 'treasury' && <Treasury stats={stats} transactions={transactions} onAddTransaction={() => setShowTransactionModal(true)} />}
-            {activeTab === 'attendance' && <Attendance sessions={sessions} onNewSession={() => setShowSessionModal(true)} />}
-            {activeTab === 'members' && <Members members={members} transactions={transactions} onAddMember={() => { setEditingMember(null); setShowMemberModal(true); }} onEditMember={handleEditMember} onToggleDisconnected={handleToggleDisconnected} onTogglePays={handleTogglePays} />}
-            {activeTab === 'settings' && <Settings palavraSemestral={palavraSemestral} onUpdatePalavra={handleUpdatePalavra} />}
-            {activeTab === 'access-control' && <AccessControl members={members} onUpdatePermissions={handleUpdatePermissions} />}
-            {activeTab === 'profile' && <Profile user={user} onUpdateUser={setUser} />}
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              
+              <Route path="/dashboard" element={
+                <ProtectedRoute user={user} permission="dashboard">
+                  <Dashboard user={user} transactions={transactions} sessions={sessions} />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/treasury" element={
+                <ProtectedRoute user={user} permission="treasury">
+                  <Treasury stats={stats} transactions={transactions} onAddTransaction={() => setShowTransactionModal(true)} />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/attendance" element={
+                <ProtectedRoute user={user} permission="attendance">
+                  <Attendance 
+                    sessions={sessions} 
+                    onNewSession={() => { setEditingSession(null); setShowSessionModal(true); }} 
+                    onEditSession={handleEditSession}
+                    onDeleteSession={handleDeleteSession}
+                  />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/members" element={
+                <ProtectedRoute user={user} permission="members">
+                  <Members 
+                    members={members} 
+                    transactions={transactions} 
+                    onAddMember={() => { setEditingMember(null); setShowMemberModal(true); }} 
+                    onEditMember={handleEditMember} 
+                    onToggleDisconnected={handleToggleDisconnected} 
+                    onTogglePays={handleTogglePays}
+                    onToggleFrequencyExempt={handleToggleFrequencyExempt}
+                  />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/settings" element={
+                <ProtectedRoute user={user} permission="settings">
+                  <Settings palavraSemestral={palavraSemestral} onUpdatePalavra={handleUpdatePalavra} />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/access-control" element={
+                <ProtectedRoute user={user} permission="access-control">
+                  <AccessControl members={members} onUpdatePermissions={handleUpdatePermissions} />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/profile" element={
+                <ProtectedRoute user={user} permission="profile">
+                  <Profile user={user} onUpdateUser={setUser} />
+                </ProtectedRoute>
+              } />
+
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
           </div>
         </div>
       </main>
 
       {showTransactionModal && <TransactionModal members={members} onClose={() => setShowTransactionModal(false)} onSubmit={handleAddTransaction} />}
       {showMemberModal && <MemberModal member={editingMember} onClose={() => { setShowMemberModal(false); setEditingMember(null); }} onSubmit={handleAddMember} />}
-      {showSessionModal && <SessionModal members={members} onClose={() => setShowSessionModal(false)} onSubmit={handleNewSession} />}
+      {showSessionModal && <SessionModal members={members} session={editingSession} onClose={() => { setShowSessionModal(false); setEditingSession(null); }} onSubmit={handleNewSession} />}
     </div>
   );
 }

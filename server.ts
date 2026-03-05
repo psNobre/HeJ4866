@@ -1,8 +1,12 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import { fileURLToPath } from "url";
 import apiRoutes from "./server/routes";
 import { initDB } from "./server/models/db";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
@@ -12,9 +16,15 @@ async function startServer() {
 
   console.log("Starting server initialization...");
   
-  // Initialize Database
-  initDB();
-  console.log("Database initialized.");
+  try {
+    // Initialize Database
+    console.log("Initializing database...");
+    initDB();
+    console.log("Database initialized successfully.");
+  } catch (dbError) {
+    console.error("CRITICAL: Database initialization failed:", dbError);
+    // Continue for now, but the app might be broken
+  }
   
   // API Routes
   app.use("/api", apiRoutes);
@@ -22,14 +32,19 @@ async function startServer() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    console.log("Initializing Vite server...");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-    console.log("Vite middleware integrated.");
+    console.log("Initializing Vite server for development...");
+    try {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+      console.log("Vite middleware integrated.");
+    } catch (viteError) {
+      console.error("CRITICAL: Vite server initialization failed:", viteError);
+    }
   } else {
+    console.log("Running in production mode.");
     app.use(express.static(path.join(__dirname, "dist")));
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "dist", "index.html"));
@@ -37,7 +52,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Humildade e Justiça nº 4866 - Server running on http://localhost:${PORT}`);
+    console.log(`Humildade e Justiça nº 4866 - Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

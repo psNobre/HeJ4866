@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, UserPlus, Search, MoreHorizontal, Shield, UserX, Wallet, CheckCircle2, AlertCircle, Edit2 } from 'lucide-react';
+import { Plus, UserPlus, Search, MoreHorizontal, Shield, UserX, Wallet, CheckCircle2, AlertCircle, Edit2, History } from 'lucide-react';
 import { Member, Transaction } from '../../types';
 import { Card } from '../ui/Card';
 import { cn } from '../../lib/utils';
@@ -29,7 +29,8 @@ export const Members = ({
   onAddMember, 
   onEditMember,
   onToggleDisconnected, 
-  onTogglePays 
+  onTogglePays,
+  onToggleFrequencyExempt
 }: { 
   members: Member[]; 
   transactions: Transaction[];
@@ -37,6 +38,7 @@ export const Members = ({
   onEditMember: (member: Member) => void;
   onToggleDisconnected: (id: number) => void;
   onTogglePays: (id: number) => void;
+  onToggleFrequencyExempt: (id: number) => void;
 }) => (
   <div className="space-y-10">
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -66,6 +68,7 @@ export const Members = ({
               <th className="pb-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Grau / Cargo</th>
               <th className="pb-6 text-xs font-bold text-slate-400 uppercase tracking-wider">CIM</th>
               <th className="pb-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Tesouraria</th>
+              <th className="pb-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Frequência</th>
               <th className="pb-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
               <th className="pb-6 text-xs font-bold text-slate-400 uppercase tracking-wider text-right pr-4">Ações</th>
             </tr>
@@ -117,12 +120,27 @@ export const Members = ({
                     </div>
                   </td>
                   <td className="py-6">
+                    <span className={cn(
+                      "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit",
+                      m.frequencyExempt ? "bg-indigo-50 text-indigo-600" : "bg-slate-100 text-slate-500"
+                    )}>
+                      {m.frequencyExempt ? "Abonado" : "Normal"}
+                    </span>
+                  </td>
+                  <td className="py-6">
                     <span className={cn("inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider w-fit", m.disconnected ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600")}>
                       {m.disconnected ? "Desligado" : "Ativo"}
                     </span>
                   </td>
                   <td className="py-6 text-right pr-4">
                     <div className="flex items-center justify-end space-x-2">
+                      <button 
+                        onClick={() => onToggleFrequencyExempt(m.id)}
+                        title={m.frequencyExempt ? "Remover Abono de Frequência" : "Abonar Frequência"}
+                        className={cn("p-2 rounded-xl transition-all", m.frequencyExempt ? "text-indigo-600 hover:bg-indigo-50" : "text-slate-400 hover:bg-slate-100")}
+                      >
+                        <History size={18} />
+                      </button>
                       <button 
                         onClick={() => onTogglePays(m.id)}
                         title={m.paysThroughLodge ? "Marcar como Isento" : "Marcar como Recolhe pela Loja"}

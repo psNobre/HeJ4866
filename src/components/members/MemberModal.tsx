@@ -119,6 +119,15 @@ export const MemberModal = ({
               />
               <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Desligado</span>
             </label>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <input 
+                type="checkbox" 
+                name="frequencyExempt" 
+                defaultChecked={!!member?.frequencyExempt} 
+                className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600" 
+              />
+              <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">Abonado (Freq. 100%)</span>
+            </label>
           </div>
         </div>
         <button type="submit" className="w-full py-5 bg-lodge-green text-white rounded-2xl font-bold hover:bg-lodge-dark transition-all shadow-lg shadow-lodge-green/20 border-b-4 border-lodge-gold">

@@ -2,6 +2,8 @@ import Database from "better-sqlite3";
 import bcrypt from "bcrypt";
 import { normalizePalavra } from "../utils/normalize";
 import path from "path";
+import { runMigrations } from "../utils/migrator";
+import { sessionsData, attendanceData } from "./seedData";
 
 const isProd = process.env.NODE_ENV === "production";
 const defaultDbName = isProd ? "masonic_lodge_prod.db" : "masonic_lodge_dev.db";
@@ -13,77 +15,8 @@ const db = new Database(dbPath);
 export function initDB() {
   console.log("Initializing database...");
   try {
-    // Initialize database
-    db.exec(`
-      CREATE TABLE IF NOT EXISTS members (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cim TEXT UNIQUE NOT NULL,
-        name TEXT NOT NULL,
-        degree TEXT NOT NULL,
-        role TEXT,
-        password TEXT NOT NULL,
-        must_change_password INTEGER DEFAULT 1,
-        initiation_date TEXT,
-        elevation_date TEXT,
-        exaltation_date TEXT,
-        payment_start_date TEXT,
-        pays_through_lodge INTEGER DEFAULT 1,
-        disconnected INTEGER DEFAULT 0,
-        active INTEGER DEFAULT 1,
-        permissions TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS settings (
-        key TEXT PRIMARY KEY,
-        value TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS sessions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL,
-        title TEXT NOT NULL,
-        type TEXT NOT NULL,
-        degree TEXT NOT NULL,
-        description TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS attendance (
-        session_id INTEGER,
-        member_id INTEGER,
-        present INTEGER DEFAULT 0,
-        PRIMARY KEY (session_id, member_id),
-        FOREIGN KEY (session_id) REFERENCES sessions(id),
-        FOREIGN KEY (member_id) REFERENCES members(id)
-      );
-
-      CREATE TABLE IF NOT EXISTS transactions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL,
-        description TEXT NOT NULL,
-        amount REAL NOT NULL,
-        type TEXT CHECK(type IN ('income', 'expense')),
-        category TEXT NOT NULL,
-        member_id INTEGER,
-        month INTEGER,
-        year INTEGER,
-        FOREIGN KEY (member_id) REFERENCES members(id)
-      );
-    `);
-
-    // Migration helper to avoid repeated try-catches
-    const runMigration = (sql: string, label: string) => {
-      try {
-        db.exec(sql);
-        console.log(`Migration: ${label}`);
-      } catch (e) {
-        // Silent fail if column exists
-      }
-    };
-
-    runMigration("ALTER TABLE transactions ADD COLUMN month INTEGER", "Added month to transactions");
-    runMigration("ALTER TABLE transactions ADD COLUMN year INTEGER", "Added year to transactions");
-    runMigration("ALTER TABLE members ADD COLUMN payment_start_date TEXT", "Added payment_start_date to members");
-    runMigration("ALTER TABLE transactions ADD COLUMN member_id INTEGER REFERENCES members(id)", "Added member_id to transactions");
+    // Run migrations from files
+    runMigrations(db);
 
     // Migration: Hash existing plain text passwords
     const allMembers = db.prepare("SELECT id, password FROM members").all() as { id: number, password: string }[];
@@ -154,7 +87,36 @@ export function initDB() {
       insert.run("337131", "Pedro Sávio de Oliveira Nobre", "Mestre", "Mestre de Cerimônias", bcrypt.hashSync("337131", saltRounds), 1, "2022-01-01", 1, 0, allPerms);
       insert.run("335738", "Raul Nixon Costa Saraiva", "Mestre", "", bcrypt.hashSync("335738", saltRounds), 1, "2022-01-01", 0, 0, defaultPerms);
       insert.run("342032", "Vagner Mota de Souza", "Mestre Instalado", "", bcrypt.hashSync("342032", saltRounds), 1, "2022-01-01", 0, 0, defaultPerms);
+      insert.run("360001", "Leonardo Teófilo Lioba", "Aprendiz", "", bcrypt.hashSync("360001", saltRounds), 1, "2026-02-26", 1, 0, defaultPerms);
+      insert.run("360002", "Sandro Silveira Lima", "Aprendiz", "", bcrypt.hashSync("360002", saltRounds), 1, "2026-02-26", 1, 0, defaultPerms);
       console.log("Seed data inserted successfully.");
+
+      // Seed Sessions
+      console.log("Seeding sessions...");
+      const insertSession = db.prepare(`
+        INSERT INTO sessions (date, title, type, degree, description) 
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      for (const s of sessionsData) {
+        insertSession.run(s[0], s[1], s[2], s[3], s[4]);
+      }
+
+      // Seed Attendance
+      console.log("Seeding attendance...");
+      const insertAttendance = db.prepare(`
+        INSERT INTO attendance (session_id, member_id, present) 
+        VALUES (?, ?, ?)
+      `);
+
+      for (const a of attendanceData) {
+        const member = db.prepare("SELECT id FROM members WHERE name = ?").get(a[0]) as { id: number } | undefined;
+        const session = db.prepare("SELECT id FROM sessions WHERE title = ?").get(a[1]) as { id: number } | undefined;
+        if (member && session) {
+          insertAttendance.run(session.id, member.id, 1);
+        }
+      }
+      console.log("Sessions and attendance seeded successfully.");
     } else {
       // Migration for existing members: Ensure Pedro Sávio and Italo have full access
       const allPerms = JSON.stringify(['dashboard', 'treasury', 'attendance', 'members', 'settings', 'profile', 'access-control']);
@@ -165,6 +127,57 @@ export function initDB() {
       db.prepare("UPDATE members SET permissions = ? WHERE role = 'Tesoureiro' AND permissions IS NULL").run(treasurerPerms);
       db.prepare("UPDATE members SET permissions = ? WHERE permissions IS NULL").run(defaultPerms);
       console.log("Migration: Updated permissions for existing members.");
+
+      // Migration: Seed sessions and attendance if they don't exist
+      console.log("Checking for missing sessions and attendance...");
+      const insertSession = db.prepare(`
+        INSERT INTO sessions (date, title, type, degree, description) 
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      const insertAttendance = db.prepare(`
+        INSERT INTO attendance (session_id, member_id, present) 
+        VALUES (?, ?, ?)
+      `);
+
+      for (const s of sessionsData) {
+        const exists = db.prepare("SELECT id FROM sessions WHERE title = ?").get(s[1]);
+        if (!exists) {
+          insertSession.run(s[0], s[1], s[2], s[3], s[4]);
+          console.log(`Migration: Added missing session ${s[1]}`);
+        }
+      }
+
+      for (const a of attendanceData) {
+        const member = db.prepare("SELECT id FROM members WHERE name = ?").get(a[0]) as { id: number } | undefined;
+        const session = db.prepare("SELECT id FROM sessions WHERE title = ?").get(a[1]) as { id: number } | undefined;
+        if (member && session) {
+          const exists = db.prepare("SELECT * FROM attendance WHERE session_id = ? AND member_id = ?").get(session.id, member.id);
+          if (!exists) {
+            insertAttendance.run(session.id, member.id, 1);
+          }
+        }
+      }
+      console.log("Sessions and attendance migration check completed.");
+
+      // Migration: Add missing members (Leonardo and Sandro) if they don't exist
+      const missingMembers = [
+        ["360001", "Leonardo Teófilo Lioba", "Aprendiz", "", "360001", 1, "2026-02-26", 1, 0, defaultPerms],
+        ["360002", "Sandro Silveira Lima", "Aprendiz", "", "360002", 1, "2026-02-26", 1, 0, defaultPerms]
+      ];
+
+      const insertMember = db.prepare(`
+        INSERT INTO members (cim, name, degree, role, password, must_change_password, initiation_date, pays_through_lodge, disconnected, permissions) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      for (const m of missingMembers) {
+        const exists = db.prepare("SELECT id FROM members WHERE cim = ?").get(m[0]);
+        if (!exists) {
+          insertMember.run(m[0], m[1], m[2], m[3], bcrypt.hashSync(m[4] as string, 10), m[5], m[6], m[7], m[8], m[9]);
+          console.log(`Migration: Added missing member ${m[1]}`);
+        }
+      }
     }
   } catch (error) {
     console.error("DATABASE INITIALIZATION ERROR:", error);

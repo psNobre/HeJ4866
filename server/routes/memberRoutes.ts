@@ -8,6 +8,7 @@ router.get("/:id/stats", memberController.getMemberStats);
 router.post("/", memberController.createMember);
 router.patch("/:id/toggle-disconnected", memberController.toggleDisconnected);
 router.patch("/:id/toggle-pays", memberController.togglePays);
+router.patch("/:id/toggle-frequency-exempt", memberController.toggleFrequencyExempt);
 router.put("/:id", memberController.updateMember);
 router.patch("/:id/permissions", memberController.updatePermissions);
 router.post("/update-profile", memberController.updateProfile);
