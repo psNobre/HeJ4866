@@ -5,6 +5,7 @@ const router = Router();
 
 router.get("/", memberController.getMembers);
 router.get("/:id/stats", memberController.getMemberStats);
+router.get("/:id/sessions", memberController.getMemberSessions);
 router.post("/", memberController.createMember);
 router.patch("/:id/toggle-disconnected", memberController.toggleDisconnected);
 router.patch("/:id/toggle-pays", memberController.togglePays);

@@ -100,6 +100,24 @@ export const MemberModal = ({
               className="input-base" 
             />
           </div>
+          <div>
+            <label className="label-base">Fim de Recolhimento</label>
+            <input 
+              name="paymentEndDate" 
+              type="date" 
+              defaultValue={member?.paymentEndDate || ""}
+              className="input-base" 
+            />
+          </div>
+          <div>
+            <label className="label-base">Início de Regularização (Freq.)</label>
+            <input 
+              name="regularizationStartDate" 
+              type="date" 
+              defaultValue={member?.regularizationStartDate || ""}
+              className="input-base" 
+            />
+          </div>
           <div className="flex items-center space-x-4 h-full pt-6">
             <label className="flex items-center space-x-3 cursor-pointer group">
               <input 

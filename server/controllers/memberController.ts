@@ -10,6 +10,8 @@ export const getMembers = (req: Request, res: Response) => {
       elevation_date as elevationDate, 
       exaltation_date as exaltationDate, 
       payment_start_date as paymentStartDate,
+      payment_end_date as paymentEndDate,
+      regularization_start_date as regularizationStartDate,
       pays_through_lodge as paysThroughLodge, 
       disconnected, active,
       must_change_password as mustChangePassword,
@@ -27,13 +29,29 @@ export const getMembers = (req: Request, res: Response) => {
 };
 
 export const createMember = (req: Request, res: Response) => {
-  const { cim, name, degree, role, initiationDate, elevationDate, exaltationDate, paymentStartDate, paysThroughLodge, disconnected, frequencyExempt } = req.body;
+  const { cim, name, degree, role, initiationDate, elevationDate, exaltationDate, paymentStartDate, paymentEndDate, regularizationStartDate, paysThroughLodge, disconnected, frequencyExempt } = req.body;
   try {
     const hashedPassword = bcrypt.hashSync(cim.toString(), 10);
     db.prepare(`
-      INSERT INTO members (cim, name, degree, role, password, must_change_password, initiation_date, elevation_date, exaltation_date, payment_start_date, pays_through_lodge, disconnected, frequency_exempt) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(cim, name, degree, role === "" ? null : role, hashedPassword, 1, initiationDate, elevationDate, exaltationDate, paymentStartDate, paysThroughLodge ? 1 : 0, disconnected ? 1 : 0, frequencyExempt ? 1 : 0);
+      INSERT INTO members (cim, name, degree, role, password, must_change_password, initiation_date, elevation_date, exaltation_date, payment_start_date, payment_end_date, regularization_start_date, pays_through_lodge, disconnected, frequency_exempt) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      cim, 
+      name, 
+      degree, 
+      role === "" ? null : role, 
+      hashedPassword, 
+      1, 
+      initiationDate, 
+      elevationDate, 
+      exaltationDate, 
+      paymentStartDate, 
+      paymentEndDate, 
+      regularizationStartDate, 
+      (paysThroughLodge === true || paysThroughLodge === '1' || paysThroughLodge === 1) ? 1 : 0, 
+      (disconnected === true || disconnected === '1' || disconnected === 1) ? 1 : 0, 
+      (frequencyExempt === true || frequencyExempt === '1' || frequencyExempt === 1) ? 1 : 0
+    );
     res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
@@ -87,6 +105,8 @@ export const updateProfile = (req: Request, res: Response) => {
         elevation_date as elevationDate, 
         exaltation_date as exaltationDate, 
         payment_start_date as paymentStartDate,
+        payment_end_date as paymentEndDate,
+        regularization_start_date as regularizationStartDate,
         pays_through_lodge as paysThroughLodge, 
         disconnected, active,
         must_change_password as mustChangePassword,
@@ -107,11 +127,11 @@ export const updateProfile = (req: Request, res: Response) => {
 
 export const updateMember = (req: Request, res: Response) => {
   const { id } = req.params;
-  const { cim, name, degree, role, initiationDate, elevationDate, exaltationDate, paymentStartDate, paysThroughLodge, disconnected, frequencyExempt } = req.body;
+  const { cim, name, degree, role, initiationDate, elevationDate, exaltationDate, paymentStartDate, paymentEndDate, regularizationStartDate, paysThroughLodge, disconnected, frequencyExempt } = req.body;
   try {
     db.prepare(`
       UPDATE members 
-      SET cim = ?, name = ?, degree = ?, role = ?, initiation_date = ?, elevation_date = ?, exaltation_date = ?, payment_start_date = ?, pays_through_lodge = ?, disconnected = ?, frequency_exempt = ?
+      SET cim = ?, name = ?, degree = ?, role = ?, initiation_date = ?, elevation_date = ?, exaltation_date = ?, payment_start_date = ?, payment_end_date = ?, regularization_start_date = ?, pays_through_lodge = ?, disconnected = ?, frequency_exempt = ?
       WHERE id = ?
     `).run(
       cim, 
@@ -122,9 +142,11 @@ export const updateMember = (req: Request, res: Response) => {
       elevationDate, 
       exaltationDate, 
       paymentStartDate,
-      paysThroughLodge ? 1 : 0, 
-      disconnected ? 1 : 0,
-      frequencyExempt ? 1 : 0,
+      paymentEndDate,
+      regularizationStartDate,
+      (paysThroughLodge === true || paysThroughLodge === '1' || paysThroughLodge === 1) ? 1 : 0, 
+      (disconnected === true || disconnected === '1' || disconnected === 1) ? 1 : 0, 
+      (frequencyExempt === true || frequencyExempt === '1' || frequencyExempt === 1) ? 1 : 0,
       id
     );
     res.json({ success: true });
@@ -137,20 +159,40 @@ export const getMemberStats = (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     // Attendance stats
-    const member = db.prepare("SELECT initiation_date as initiationDate, payment_start_date as paymentStartDate, pays_through_lodge as paysThroughLodge, frequency_exempt as frequencyExempt FROM members WHERE id = ?").get(id) as any;
+    const member = db.prepare("SELECT initiation_date as initiationDate, regularization_start_date as regularizationStartDate, payment_start_date as paymentStartDate, pays_through_lodge as paysThroughLodge, frequency_exempt as frequencyExempt FROM members WHERE id = ?").get(id) as any;
     
     let attendanceRate = 0;
     if (member.frequencyExempt) {
       attendanceRate = 100;
     } else {
-      const attendance = db.prepare(`
+      const twelveMonthsAgo = new Date();
+      twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+      const dateLimit = twelveMonthsAgo.toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0];
+      const frequencyBaseDate = member.regularizationStartDate || member.initiationDate || '1900-01-01';
+
+      const stats = db.prepare(`
         SELECT 
-          COUNT(*) as total,
-          SUM(CASE WHEN present = 1 THEN 1 ELSE 0 END) as attended
-        FROM attendance
-        WHERE member_id = ?
-      `).get(id) as { total: number, attended: number };
-      attendanceRate = attendance.total > 0 ? Math.round((attendance.attended / attendance.total) * 100) : 0;
+          (
+            SELECT COUNT(*) 
+            FROM sessions s
+            WHERE s.date <= ?
+            AND s.date >= ?
+            AND s.date >= ?
+          ) as total,
+          (
+            SELECT COUNT(*) 
+            FROM attendance a 
+            JOIN sessions s ON a.session_id = s.id 
+            WHERE a.member_id = ? 
+            AND a.present = 1 
+            AND s.date <= ?
+            AND s.date >= ?
+            AND s.date >= ?
+          ) as attended
+      `).get(today, dateLimit, frequencyBaseDate, id, today, dateLimit, frequencyBaseDate) as { total: number, attended: number };
+      
+      attendanceRate = stats.total > 0 ? Math.round((stats.attended / stats.total) * 100) : 0;
     }
 
     // Compliance stats
@@ -164,7 +206,9 @@ export const getMemberStats = (req: Request, res: Response) => {
     }
 
     const startDate = new Date(startDateStr);
+    const endDate = member.paymentEndDate ? new Date(member.paymentEndDate) : new Date();
     const now = new Date();
+    const limitDate = endDate < now ? endDate : now;
 
     const paidTransactions = db.prepare(`
       SELECT month, year 
@@ -185,7 +229,7 @@ export const getMemberStats = (req: Request, res: Response) => {
 
     const missingMonths: string[] = [];
     let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    while (current <= now) {
+    while (current <= limitDate) {
       const m = current.getMonth() + 1;
       const y = current.getFullYear();
       const key = `${m}-${y}`;
@@ -212,6 +256,22 @@ export const getMemberStats = (req: Request, res: Response) => {
       totalPayments: paidTransactions.length,
       requiredPayments: paidTransactions.length + missingMonths.length // This is a bit dynamic
     });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const getMemberSessions = (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const sessions = db.prepare(`
+      SELECT s.* 
+      FROM sessions s
+      JOIN attendance a ON s.id = a.session_id
+      WHERE a.member_id = ? AND a.present = 1
+      ORDER BY s.date DESC
+    `).all(id);
+    res.json(sessions);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

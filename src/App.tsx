@@ -150,10 +150,12 @@ function App() {
   const handleAddMember = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData);
-    data.paysThroughLodge = data.paysThroughLodge === 'on' ? '1' : '0';
-    data.disconnected = data.disconnected === 'on' ? '1' : '0';
-    data.frequencyExempt = data.frequencyExempt === 'on' ? '1' : '0';
+    const data: any = Object.fromEntries(formData);
+    
+    // Fix: Checkboxes should be boolean to avoid truthy string '0' issue in backend
+    data.paysThroughLodge = formData.get('paysThroughLodge') === 'on';
+    data.disconnected = formData.get('disconnected') === 'on';
+    data.frequencyExempt = formData.get('frequencyExempt') === 'on';
     
     const url = editingMember ? `/api/members/${editingMember.id}` : '/api/members';
     const method = editingMember ? 'PUT' : 'POST';
@@ -190,10 +192,6 @@ function App() {
 
     const url = editingSession ? `/api/sessions/${editingSession.id}` : '/api/sessions';
     const method = editingSession ? 'PUT' : 'POST';
-
-    if (editingSession && !window.confirm("Deseja salvar as alterações nesta sessão?")) {
-      return;
-    }
 
     const res = await fetch(url, {
       method,

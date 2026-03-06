@@ -8,6 +8,8 @@ export interface Member {
   elevationDate?: string;
   exaltationDate?: string;
   paymentStartDate?: string;
+  paymentEndDate?: string;
+  regularizationStartDate?: string;
   paysThroughLodge: number;
   disconnected: number;
   active: number;

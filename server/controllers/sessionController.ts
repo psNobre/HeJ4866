@@ -107,7 +107,7 @@ export const getMemberAttendanceStats = (req: Request, res: Response) => {
         SELECT COUNT(*) 
         FROM sessions s
         WHERE s.date <= ?
-        AND s.date >= COALESCE(m.initiation_date, '1900-01-01')
+        AND s.date >= COALESCE(m.regularization_start_date, m.initiation_date, '1900-01-01')
         ${dateFilter}
       ) as totalSessions,
       CASE 
@@ -116,7 +116,7 @@ export const getMemberAttendanceStats = (req: Request, res: Response) => {
             SELECT COUNT(*) 
             FROM sessions s
             WHERE s.date <= ?
-            AND s.date >= COALESCE(m.initiation_date, '1900-01-01')
+            AND s.date >= COALESCE(m.regularization_start_date, m.initiation_date, '1900-01-01')
             ${dateFilter}
           )
         ELSE
@@ -127,6 +127,7 @@ export const getMemberAttendanceStats = (req: Request, res: Response) => {
             WHERE a.member_id = m.id 
             AND a.present = 1 
             AND s.date <= ?
+            AND s.date >= COALESCE(m.regularization_start_date, m.initiation_date, '1900-01-01')
             ${dateFilter}
           )
       END as presences,
@@ -137,7 +138,7 @@ export const getMemberAttendanceStats = (req: Request, res: Response) => {
             SELECT COUNT(*) 
             FROM sessions s
             WHERE s.date <= ?
-            AND s.date >= COALESCE(m.initiation_date, '1900-01-01')
+            AND s.date >= COALESCE(m.regularization_start_date, m.initiation_date, '1900-01-01')
             ${dateFilter}
             AND NOT EXISTS (
               SELECT 1 FROM attendance a 

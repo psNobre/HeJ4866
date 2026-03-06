@@ -28,6 +28,13 @@ async function startServer() {
   
   // API Routes
   app.use("/api", apiRoutes);
+  
+  // Debug route to download DB
+  app.get("/api/debug/download-db", (req, res) => {
+    const dbPath = path.join(process.cwd(), "masonic_lodge_dev.db");
+    res.download(dbPath, "masonic_lodge_dev.db");
+  });
+  
   console.log("API routes registered.");
 
   // Vite middleware for development

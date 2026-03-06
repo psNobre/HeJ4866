@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS members (
   elevation_date TEXT,
   exaltation_date TEXT,
   payment_start_date TEXT,
+  payment_end_date TEXT,
+  regularization_start_date TEXT,
   pays_through_lodge INTEGER DEFAULT 1,
   disconnected INTEGER DEFAULT 0,
   active INTEGER DEFAULT 1,

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Calendar, Users, History, Trash2, Edit2, ChevronLeft, ChevronRight, Filter, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Session, MemberAttendanceStats } from '../../types';
 import { Card } from '../ui/Card';
 import { ViewAttendanceModal } from './ViewAttendanceModal';
+import { cn } from '../../lib/utils';
 
 export const Attendance = ({ 
   sessions, 
@@ -20,16 +21,32 @@ export const Attendance = ({
   const [statsFilter, setStatsFilter] = useState<'year' | '12months' | 'all'>('all');
   const [statsLoading, setStatsLoading] = useState(true);
   const [viewingSession, setViewingSession] = useState<Session | null>(null);
+  const [showOnlyNonExempt, setShowOnlyNonExempt] = useState(false);
   
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
+  const filteredMemberStats = useMemo(() => {
+    return showOnlyNonExempt 
+      ? memberStats.filter(stat => !stat.frequencyExempt) 
+      : memberStats;
+  }, [memberStats, showOnlyNonExempt]);
+
+  // Pagination state for Sessions
+  const [sessionsPage, setSessionsPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(sessions.length / itemsPerPage);
+  const totalSessionsPages = Math.ceil(sessions.length / itemsPerPage);
   
-  const paginatedSessions = sessions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedSessions = useMemo(() => {
+    const start = (sessionsPage - 1) * itemsPerPage;
+    return sessions.slice(start, start + itemsPerPage);
+  }, [sessions, sessionsPage]);
+
+  // Pagination state for Member Stats
+  const [statsPage, setStatsPage] = useState(1);
+  const totalStatsPages = Math.ceil(filteredMemberStats.length / itemsPerPage);
+
+  const paginatedMemberStats = useMemo(() => {
+    const start = (statsPage - 1) * itemsPerPage;
+    return filteredMemberStats.slice(start, start + itemsPerPage);
+  }, [filteredMemberStats, statsPage]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -39,6 +56,7 @@ export const Attendance = ({
         const data = await res.json();
         if (Array.isArray(data)) {
           setMemberStats(data);
+          setStatsPage(1); // Reset to first page when filter changes
         } else {
           console.error("Member stats data is not an array:", data);
           setMemberStats([]);
@@ -71,25 +89,40 @@ export const Attendance = ({
         title="Frequência por Obreiro" 
         subtitle="Relação de presenças e faltas"
         action={
-          <div className="flex-items-center bg-slate-50 p-1 rounded-xl border border-slate-100">
+          <div className="flex-items-center space-x-4">
             <button 
-              onClick={() => setStatsFilter('all')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              onClick={() => setShowOnlyNonExempt(!showOnlyNonExempt)}
+              className={cn(
+                "flex-items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border",
+                showOnlyNonExempt 
+                  ? "bg-zinc-950 text-white border-zinc-950" 
+                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+              )}
             >
-              Tudo
+              <Filter size={14} />
+              <span>{showOnlyNonExempt ? "Mostrando Apenas Ativos" : "Filtrar Abonados"}</span>
             </button>
-            <button 
-              onClick={() => setStatsFilter('12months')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === '12months' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              12 Meses
-            </button>
-            <button 
-              onClick={() => setStatsFilter('year')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === 'year' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
-            >
-              Este Ano
-            </button>
+
+            <div className="flex-items-center bg-slate-50 p-1 rounded-xl border border-slate-100">
+              <button 
+                onClick={() => setStatsFilter('all')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                Tudo
+              </button>
+              <button 
+                onClick={() => setStatsFilter('12months')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === '12months' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                12 Meses
+              </button>
+              <button 
+                onClick={() => setStatsFilter('year')}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === 'year' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                Este Ano
+              </button>
+            </div>
           </div>
         }
       >
@@ -110,7 +143,8 @@ export const Attendance = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {memberStats.map((stat) => {
+                {paginatedMemberStats.map((stat) => {
+                  const isExempt = stat.frequencyExempt === 1;
                   const rate = stat.totalSessions > 0 ? Math.round((stat.presences / stat.totalSessions) * 100) : 0;
                   return (
                     <tr key={stat.id} className="table-row-hover">
@@ -121,23 +155,35 @@ export const Attendance = ({
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{stat.degree}</span>
                       </td>
                       <td className="py-4 text-center">
-                        <span className="text-sm font-bold text-emerald-600">{stat.presences}</span>
+                        {isExempt ? (
+                          <span className="badge-base bg-indigo-50 text-indigo-600">Isento</span>
+                        ) : (
+                          <span className="text-sm font-bold text-emerald-600">{stat.presences}</span>
+                        )}
                       </td>
                       <td className="py-4 text-center">
-                        <span className="text-sm font-bold text-rose-600">{stat.absences}</span>
+                        {isExempt ? (
+                          <span className="badge-base bg-indigo-50 text-indigo-600">Isento</span>
+                        ) : (
+                          <span className="text-sm font-bold text-rose-600">{stat.absences}</span>
+                        )}
                       </td>
                       <td className="py-4 text-right pr-4">
-                        <div className="flex-items-center justify-end space-x-3">
-                          <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full ${rate >= 75 ? 'bg-emerald-500' : rate >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} 
-                              style={{ width: `${rate}%` }} 
-                            />
+                        {isExempt ? (
+                          <span className="badge-base bg-indigo-50 text-indigo-600">Isento</span>
+                        ) : (
+                          <div className="flex-items-center justify-end space-x-3">
+                            <div className="w-20 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full rounded-full ${rate >= 75 ? 'bg-emerald-500' : rate >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`} 
+                                style={{ width: `${rate}%` }} 
+                              />
+                            </div>
+                            <span className={`text-xs font-bold ${rate >= 75 ? 'text-emerald-600' : rate >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+                              {rate}%
+                            </span>
                           </div>
-                          <span className={`text-xs font-bold ${rate >= 75 ? 'text-emerald-600' : rate >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
-                            {rate}%
-                          </span>
-                        </div>
+                        )}
                       </td>
                     </tr>
                   );
@@ -146,6 +192,46 @@ export const Attendance = ({
             </table>
           )}
         </div>
+
+        {totalStatsPages > 1 && (
+          <div className="flex-between mt-10 pt-6 border-t border-slate-100">
+            <p className="text-sm text-slate-500">
+              Mostrando <span className="font-bold text-slate-900">{paginatedMemberStats.length}</span> de <span className="font-bold text-slate-900">{filteredMemberStats.length}</span> obreiros
+            </p>
+            <div className="flex-items-center space-x-2">
+              <button 
+                onClick={() => setStatsPage(prev => Math.max(1, prev - 1))}
+                disabled={statsPage === 1}
+                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <div className="flex space-x-1">
+                {Array.from({ length: totalStatsPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setStatsPage(page)}
+                    className={cn(
+                      "w-10 h-10 rounded-xl text-sm font-bold transition-all",
+                      statsPage === page 
+                        ? "bg-zinc-950 text-white shadow-lg shadow-zinc-950/20" 
+                        : "text-slate-600 hover:bg-slate-100"
+                    )}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={() => setStatsPage(prev => Math.min(totalStatsPages, prev + 1))}
+                disabled={statsPage === totalStatsPages}
+                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+        )}
       </Card>
 
       <Card 
@@ -231,24 +317,39 @@ export const Attendance = ({
           </table>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex-between mt-8 pt-8 border-t border-slate-50">
-            <p className="text-xs-bold-uppercase text-slate-400">
-              Página {currentPage} de {totalPages}
+        {totalSessionsPages > 1 && (
+          <div className="flex-between mt-10 pt-6 border-t border-slate-100">
+            <p className="text-sm text-slate-500">
+              Mostrando <span className="font-bold text-slate-900">{paginatedSessions.length}</span> de <span className="font-bold text-slate-900">{sessions.length}</span> sessões
             </p>
             <div className="flex-items-center space-x-2">
               <button 
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-transparent transition-all"
+                onClick={() => setSessionsPage(prev => Math.max(1, prev - 1))}
+                disabled={sessionsPage === 1}
+                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronLeft size={20} />
               </button>
+              <div className="flex space-x-1">
+                {Array.from({ length: totalSessionsPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setSessionsPage(page)}
+                    className={cn(
+                      "w-10 h-10 rounded-xl text-sm font-bold transition-all",
+                      sessionsPage === page 
+                        ? "bg-zinc-950 text-white shadow-lg shadow-zinc-950/20" 
+                        : "text-slate-600 hover:bg-slate-100"
+                    )}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
               <button 
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-xl border border-slate-100 text-slate-400 hover:bg-slate-50 disabled:opacity-50 disabled:hover:bg-transparent transition-all"
+                onClick={() => setSessionsPage(prev => Math.min(totalSessionsPages, prev + 1))}
+                disabled={sessionsPage === totalSessionsPages}
+                className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 <ChevronRight size={20} />
               </button>

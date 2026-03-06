@@ -29,10 +29,6 @@ export const Header = ({
     </div>
 
     <div className="flex items-center space-x-4">
-      <button className="p-2 text-slate-600 hover:bg-slate-50 rounded-lg relative">
-        <div className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
-        <History size={20} />
-      </button>
       <div className="h-8 w-px bg-slate-200 mx-2" />
       <div className="flex items-center space-x-4">
         <div className="text-right hidden sm:block">

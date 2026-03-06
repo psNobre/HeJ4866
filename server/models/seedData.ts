@@ -333,5 +333,19 @@ export const attendanceData = [
   ["Jose Arthur Façanha Xenofonte Filho", "2026-02-26 - Magna"],
   ["Fabrício de Oliveira Carvalho", "2026-02-26 - Magna"],
   ["Raul Nixon Costa Saraiva", "2026-02-26 - Magna"],
-  ["Alexandre Barreira Aragão", "2026-02-26 - Magna"]
+  ["Alexandre Barreira Aragão", "2026-02-26 - Magna"],
+  ["Leonardo Teófilo Lioba", "2026-03-05 - Pública"],
+  ["Sandro Silveira Lima", "2026-03-05 - Pública"],
+  ["Leonardo de Almeida Monteiro", "2026-03-05 - Pública"],
+  ["Pedro Felipe Lima Rocha", "2026-03-05 - Pública"],
+  ["Johnes Gonçalves Madeira", "2026-03-05 - Pública"],
+  ["Gregory Matheus Manoel Silva", "2026-03-05 - Pública"],
+  ["Marcelo Holanda Calvacante", "2026-03-05 - Pública"],
+  ["Marcus Vinicius Magalhães Pontes", "2026-03-05 - Pública"],
+  ["Pedro Sávio de Oliveira Nobre", "2026-03-05 - Pública"],
+  ["Emanual Chavez Roque", "2026-03-05 - Pública"],
+  ["Fabrício de Oliveira Carvalho", "2026-03-05 - Pública"],
+  ["Raul Nixon Costa Saraiva", "2026-03-05 - Pública"],
+  ["José Diego Dantas de Araújo", "2026-03-05 - Pública"],
+  ["Alexandre Barreira Aragão", "2026-03-05 - Pública"]
 ];
