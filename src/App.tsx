@@ -198,7 +198,6 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         date: formData.get('date'),
-        title: formData.get('title'),
         type: formData.get('type'),
         degree: formData.get('degree'),
         description: formData.get('description'),

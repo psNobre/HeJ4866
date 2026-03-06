@@ -252,8 +252,8 @@ export const Attendance = ({
             <thead>
               <tr className="text-left border-b border-slate-100">
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 pl-4">Data</th>
-                <th className="pb-6 text-xs-bold-uppercase text-slate-400">Título</th>
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400">Tipo/Grau</th>
+                <th className="pb-6 text-xs-bold-uppercase text-slate-400">Descrição</th>
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 text-right pr-4">Ações</th>
               </tr>
             </thead>
@@ -265,15 +265,12 @@ export const Attendance = ({
                     </td>
                     <td className="py-6">
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-700">{s.title}</span>
-                        {s.description && <span className="text-[10px] text-slate-400 italic">{s.description}</span>}
-                      </div>
-                    </td>
-                    <td className="py-6">
-                      <div className="flex flex-col">
                         <span className="text-xs font-bold text-zinc-950">{s.type}</span>
                         <span className="text-xs-bold-uppercase text-slate-400">{s.degree}</span>
                       </div>
+                    </td>
+                    <td className="py-6">
+                      {s.description && <span className="text-[10px] text-slate-400 italic">{s.description}</span>}
                     </td>
                     <td className="py-6 text-right pr-4">
                       <div className="flex-center justify-end space-x-2">

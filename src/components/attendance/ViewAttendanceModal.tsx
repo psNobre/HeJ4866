@@ -39,8 +39,8 @@ export const ViewAttendanceModal = ({
       <div className="modal-overlay" onClick={onClose} />
       <Card 
         className="w-full max-w-2xl relative z-10 max-h-full overflow-y-auto" 
-        title={`Presenças: ${session.title}`} 
-        subtitle={`${session.date} • ${session.type} • ${session.degree}`}
+        title={`Presenças: ${session.date}`} 
+        subtitle={`${session.type} • ${session.degree}`}
       >
         <button onClick={onClose} className="absolute top-8 right-8 p-2 hover:bg-slate-50 rounded-xl transition-all">
           <X size={20} className="text-slate-400" />

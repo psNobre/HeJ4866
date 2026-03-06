@@ -65,16 +65,6 @@ export const SessionModal = ({
         ) : (
           <form onSubmit={onSubmit} className="space-y-8 mt-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label className="label-base">Título da Sessão</label>
-                <input 
-                  name="title" 
-                  required 
-                  defaultValue={session?.title}
-                  placeholder="Ex: Sessão de Instrução" 
-                  className="input-base" 
-                />
-              </div>
               <div>
                 <label className="label-base">Tipo de Sessão</label>
                 <select 

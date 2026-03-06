@@ -64,8 +64,8 @@ export function initDB() {
     if (memberCount.count === 0) {
       console.log("Seeding initial members...");
       const insert = db.prepare(`
-        INSERT INTO members (cim, name, degree, role, password, must_change_password, initiation_date, pays_through_lodge, disconnected, frequency_exempt, permissions, payment_end_date, regularization_start_date) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO members (cim, name, degree, role, password, must_change_password, initiation_date, pays_through_lodge, disconnected, frequency_exempt, permissions, payment_end_date, regularization_start_date, payment_start_date) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
       
       const saltRounds = 10;
@@ -73,46 +73,46 @@ export function initDB() {
       const treasurerPerms = JSON.stringify(['dashboard', 'treasury', 'members', 'profile']);
       const defaultPerms = JSON.stringify(['dashboard', 'profile']);
 
-      insert.run("294445", "Alex Araujo de Vasconcellos", "Mestre Instalado", "", bcrypt.hashSync("294445", saltRounds), 1, "1717-06-24", 1, 0, 0, defaultPerms, null, "2024-09-26");
-      insert.run("340196", "Alexandre Barreira Aragão", "Mestre", "", bcrypt.hashSync("340196", saltRounds), 1, "1314-03-18", 1, 0, 1, defaultPerms, null, "2024-10-24");
-      insert.run("304489", "Dirceu de Sousa Bezerra", "Mestre", "", bcrypt.hashSync("304489", saltRounds), 1, "1752-11-04", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("347193", "Edmo Magalhães Carneiro Júnior", "Mestre", "", bcrypt.hashSync("347193", saltRounds), 1, "1731-02-01", 1, 0, 0, defaultPerms, null, "2025-06-05");
-      insert.run("343633", "Emanual Chavez Roque", "Mestre", "", bcrypt.hashSync("343633", saltRounds), 1, "1822-08-02", 0, 0, 1, defaultPerms, null, "2025-08-28");
-      insert.run("336610", "Fábio Rodrigues Ferreira", "Mestre", "", bcrypt.hashSync("330958", saltRounds), 1, "2023-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("330958", "Fabrício de Oliveira Carvalho", "Mestre", "2° Vigilante", bcrypt.hashSync("330958", saltRounds), 1, "2022-01-01", 1, 0, 0, defaultPerms, null, "2024-09-26");
-      insert.run("342810", "Felipe Bandeira de Medeiros", "Mestre", "", bcrypt.hashSync("342810", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("202940", "Francisco Círio Tabosa Maia", "Mestre Instalado", "", bcrypt.hashSync("202940", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("308163", "Francisco Weber dos Anjos", "Mestre Instalado", "", bcrypt.hashSync("308163", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("339299", "Francisco Welington Andrade Paiva", "Mestre Instalado", " ", bcrypt.hashSync("339299", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("339349", "Gabriel de Oliveira Marreiros", "Mestre", "", bcrypt.hashSync("339349", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("357063", "Gregory Matheus Manoel Silva", "Aprendiz", "", bcrypt.hashSync("357063", saltRounds), 1, "2025-10-23", 1, 0, 0, defaultPerms, null, "2025-10-23");
-      insert.run("330960", "Guilherme Braga dos Santos Rodrigues", "Mestre", "Secretário", bcrypt.hashSync("330960", saltRounds), 1, "2022-01-01", 1, 0, 0, defaultPerms, null, "2024-09-26");
-      insert.run("325077", "Italo Leite da Silva", "Mestre Instalado", "Venerável Mestre", bcrypt.hashSync("325077", saltRounds), 1, "2022-01-01", 1, 0, 0, allPerms, null, "2024-09-26");
-      insert.run("355121", "Johnes Gonçalves Madeira", "Aprendiz", "", bcrypt.hashSync("355121", saltRounds), 1, "2025-08-09", 1, 0, 0, defaultPerms, null, "2025-08-09");
-      insert.run("333167", "Jose Arthur Façanha Xenofonte Filho", "Mestre", "", bcrypt.hashSync("333167", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("351782", "José Diego Dantas de Araújo", "Aprendiz", "", bcrypt.hashSync("351782", saltRounds), 1, "2025-03-16", 1, 0, 0, defaultPerms, null, "2025-03-16");
-      insert.run("271382", "Leonardo de Almeida Monteiro", "Mestre Instalado", "", bcrypt.hashSync("271382", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("335383", "Levy Sombra de Oliveira Barcelos", "Mestre Instalado", "", bcrypt.hashSync("335383", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("340197", "Marcelo Holanda Calvacante", "Mestre", "Tesoureiro", bcrypt.hashSync("340197", saltRounds), 1, "2022-01-01", 1, 0, 0, treasurerPerms, null, "2024-10-24");
-      insert.run("355122", "Marcus Vinicius Magalhães Pontes", "Aprendiz", "", bcrypt.hashSync("355122", saltRounds), 1, "2025-08-09", 1, 0, 0, defaultPerms, null, "2025-08-09");
-      insert.run("320999", "Paulo Roberto de Lima Carvalho", "Mestre", "", bcrypt.hashSync("320999", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("330959", "Pedro Felipe Lima Rocha", "Mestre", "1° Vigilante", bcrypt.hashSync("330959", saltRounds), 1, "2022-01-01", 1, 0, 0, defaultPerms, null, "2024-09-26");
-      insert.run("337131", "Pedro Sávio de Oliveira Nobre", "Mestre", "Chanceler", bcrypt.hashSync("337131", saltRounds), 1, "2022-01-01", 1, 0, 0, allPerms, null, "2024-09-26");
-      insert.run("335738", "Raul Nixon Costa Saraiva", "Mestre", "", bcrypt.hashSync("335738", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("342032", "Vagner Mota de Souza", "Mestre Instalado", "", bcrypt.hashSync("342032", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26");
-      insert.run("360001", "Leonardo Teófilo Lioba", "Aprendiz", "", bcrypt.hashSync("360001", saltRounds), 1, "2026-02-26", 1, 0, 0, defaultPerms, null, "2026-02-26");
-      insert.run("360002", "Sandro Silveira Lima", "Aprendiz", "", bcrypt.hashSync("360002", saltRounds), 1, "2026-02-26", 1, 0, 0, defaultPerms, null, "2026-02-26");
+      insert.run("294445", "Alex Araujo de Vasconcellos", "Mestre Instalado", "", bcrypt.hashSync("294445", saltRounds), 1, "1717-06-24", 1, 0, 0, defaultPerms, null, "2024-09-26", "2026-02-01");
+      insert.run("340196", "Alexandre Barreira Aragão", "Mestre", "", bcrypt.hashSync("340196", saltRounds), 1, "1314-03-18", 1, 0, 1, defaultPerms, null, "2024-10-24", "2024-12-01");
+      insert.run("304489", "Dirceu de Sousa Bezerra", "Mestre", "", bcrypt.hashSync("304489", saltRounds), 1, "1752-11-04", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("347193", "Edmo Magalhães Carneiro Júnior", "Mestre", "", bcrypt.hashSync("347193", saltRounds), 1, "1731-02-01", 1, 0, 0, defaultPerms, null, "2025-06-05", "2025-08-01");
+      insert.run("343633", "Emanual Chavez Roque", "Mestre", "", bcrypt.hashSync("343633", saltRounds), 1, "1822-08-02", 0, 0, 1, defaultPerms, null, "2025-08-28", null);
+      insert.run("336610", "Fábio Rodrigues Ferreira", "Mestre", "", bcrypt.hashSync("336610", saltRounds), 1, "2023-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("330958", "Fabrício de Oliveira Carvalho", "Mestre", "2° Vigilante", bcrypt.hashSync("330958", saltRounds), 1, "2022-01-01", 1, 0, 0, defaultPerms, null, "2024-09-26", "2024-11-01");
+      insert.run("342810", "Felipe Bandeira de Medeiros", "Mestre", "", bcrypt.hashSync("342810", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("202940", "Francisco Círio Tabosa Maia", "Mestre Instalado", "", bcrypt.hashSync("202940", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("308163", "Francisco Weber dos Anjos", "Mestre Instalado", "", bcrypt.hashSync("308163", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("339299", "Francisco Welington Andrade Paiva", "Mestre Instalado", " ", bcrypt.hashSync("339299", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("339349", "Gabriel de Oliveira Marreiros", "Mestre", "", bcrypt.hashSync("339349", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("357063", "Gregory Matheus Manoel Silva", "Aprendiz", "", bcrypt.hashSync("357063", saltRounds), 1, "2025-10-23", 1, 0, 0, defaultPerms, null, "2025-10-23", "2025-11-01");
+      insert.run("330960", "Guilherme Braga dos Santos Rodrigues", "Mestre", "Secretário", bcrypt.hashSync("330960", saltRounds), 1, "2022-01-01", 1, 0, 0, defaultPerms, null, "2024-09-26", "2024-11-01");
+      insert.run("325077", "Italo Leite da Silva", "Mestre Instalado", "Venerável Mestre", bcrypt.hashSync("325077", saltRounds), 1, "2022-01-01", 1, 0, 0, allPerms, null, "2024-09-26", "2024-11-01");
+      insert.run("355121", "Johnes Gonçalves Madeira", "Aprendiz", "", bcrypt.hashSync("355121", saltRounds), 1, "2025-08-09", 1, 0, 0, defaultPerms, null, "2025-08-09", "2025-09-01");
+      insert.run("333167", "Jose Arthur Façanha Xenofonte Filho", "Mestre", "", bcrypt.hashSync("333167", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("351782", "José Diego Dantas de Araújo", "Aprendiz", "", bcrypt.hashSync("351782", saltRounds), 1, "2025-03-16", 1, 0, 0, defaultPerms, null, "2025-03-16", "2025-04-01");
+      insert.run("271382", "Leonardo de Almeida Monteiro", "Mestre Instalado", "", bcrypt.hashSync("271382", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("335383", "Levy Sombra de Oliveira Barcelos", "Mestre Instalado", "", bcrypt.hashSync("335383", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("340197", "Marcelo Holanda Calvacante", "Mestre", "Tesoureiro", bcrypt.hashSync("340197", saltRounds), 1, "2022-01-01", 1, 0, 0, treasurerPerms, null, "2024-10-24", "2024-12-01");
+      insert.run("355122", "Marcus Vinicius Magalhães Pontes", "Aprendiz", "", bcrypt.hashSync("355122", saltRounds), 1, "2025-08-09", 1, 0, 0, defaultPerms, null, "2025-08-09", "2025-09-01");
+      insert.run("320999", "Paulo Roberto de Lima Carvalho", "Mestre", "", bcrypt.hashSync("320999", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("330959", "Pedro Felipe Lima Rocha", "Mestre", "1° Vigilante", bcrypt.hashSync("330959", saltRounds), 1, "2022-01-01", 1, 0, 0, defaultPerms, null, "2024-09-26", "2024-11-01");
+      insert.run("337131", "Pedro Sávio de Oliveira Nobre", "Mestre", "Chanceler", bcrypt.hashSync("337131", saltRounds), 1, "2022-01-01", 1, 0, 0, allPerms, null, "2024-09-26", "2024-11-01");
+      insert.run("335738", "Raul Nixon Costa Saraiva", "Mestre", "", bcrypt.hashSync("335738", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("342032", "Vagner Mota de Souza", "Mestre Instalado", "", bcrypt.hashSync("342032", saltRounds), 1, "2022-01-01", 0, 0, 1, defaultPerms, null, "2024-09-26", null);
+      insert.run("360001", "Leonardo Teófilo Lioba", "Aprendiz", "", bcrypt.hashSync("360001", saltRounds), 1, "2026-02-26", 1, 0, 0, defaultPerms, null, "2026-02-26", null);
+      insert.run("360002", "Sandro Silveira Lima", "Aprendiz", "", bcrypt.hashSync("360002", saltRounds), 1, "2026-02-26", 1, 0, 0, defaultPerms, null, "2026-02-26", null);
       console.log("Seed data inserted successfully.");
 
       // Seed Sessions
       console.log(`Seeding ${sessionsData.length} sessions...`);
       const insertSession = db.prepare(`
-        INSERT INTO sessions (date, title, type, degree, description) 
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO sessions (date, type, degree, description) 
+        VALUES (?, ?, ?, ?)
       `);
 
       for (const s of sessionsData) {
-        insertSession.run(s[0], s[1], s[2], s[3], s[4]);
+        insertSession.run(s[0], s[2], s[3], s[4]);
       }
 
       // Seed Attendance
@@ -124,7 +124,9 @@ export function initDB() {
 
       for (const a of attendanceData) {
         const member = db.prepare("SELECT id FROM members WHERE name = ?").get(a[0]) as { id: number } | undefined;
-        const session = db.prepare("SELECT id FROM sessions WHERE title = ?").get(a[1]) as { id: number } | undefined;
+        // Match session by date (first 10 chars of the title string in seedData)
+        const sessionDate = a[1].substring(0, 10);
+        const session = db.prepare("SELECT id FROM sessions WHERE date = ?").get(sessionDate) as { id: number } | undefined;
         if (member && session) {
           try {
             insertAttendance.run(session.id, member.id, 1);
@@ -148,8 +150,8 @@ export function initDB() {
       // Migration: Seed sessions and attendance if they don't exist
       console.log("Checking for missing sessions and attendance...");
       const insertSession = db.prepare(`
-        INSERT INTO sessions (date, title, type, degree, description) 
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO sessions (date, type, degree, description) 
+        VALUES (?, ?, ?, ?)
       `);
 
       const insertAttendance = db.prepare(`
@@ -159,9 +161,9 @@ export function initDB() {
 
       let sessionsAdded = 0;
       for (const s of sessionsData) {
-        const exists = db.prepare("SELECT id FROM sessions WHERE title = ?").get(s[1]);
+        const exists = db.prepare("SELECT id FROM sessions WHERE date = ?").get(s[0]);
         if (!exists) {
-          insertSession.run(s[0], s[1], s[2], s[3], s[4]);
+          insertSession.run(s[0], s[2], s[3], s[4]);
           sessionsAdded++;
         }
       }
@@ -170,7 +172,8 @@ export function initDB() {
       let attendanceAdded = 0;
       for (const a of attendanceData) {
         const member = db.prepare("SELECT id FROM members WHERE name = ?").get(a[0]) as { id: number } | undefined;
-        const session = db.prepare("SELECT id FROM sessions WHERE title = ?").get(a[1]) as { id: number } | undefined;
+        const sessionDate = a[1].substring(0, 10);
+        const session = db.prepare("SELECT id FROM sessions WHERE date = ?").get(sessionDate) as { id: number } | undefined;
         if (member && session) {
           try {
             const info = insertAttendance.run(session.id, member.id, 1);
@@ -199,6 +202,32 @@ export function initDB() {
           console.log(`Migration: Added missing member ${m[1]}`);
         }
       }
+
+      // Migration: Update payment_start_date for specific members
+      console.log("Migration: Updating payment_start_date for specific members...");
+      const updatePaymentStart = db.prepare("UPDATE members SET payment_start_date = ? WHERE name LIKE ?");
+      const paymentStartDates = [
+        ["2024-11-01", "%Italo Leite da Silva%"],
+        ["2024-11-01", "%Fabrício de Oliveira Carvalho%"],
+        ["2024-11-01", "%Pedro Felipe Lima Rocha%"],
+        ["2024-11-01", "%Guilherme Braga dos Santos Rodrigues%"],
+        ["2024-11-01", "%Pedro Sávio de Oliveira Nobre%"],
+        ["2024-12-01", "%Alexandre Barreira Aragão%"],
+        ["2024-12-01", "%Marcelo Holanda Calvacante%"],
+        ["2025-04-01", "%José Diego Dantas de Araújo%"],
+        ["2025-08-01", "%Edmo Magalhães Carneiro Júnior%"],
+        ["2025-09-01", "%Johnes Gonçalves Madeira%"],
+        ["2025-09-01", "%Marcus Vinicius Magalhães Pontes%"],
+        ["2025-11-01", "%Gregory Matheus Manoel Silva%"],
+        ["2026-02-01", "%Alex Araujo de Vasconcellos%"]
+      ];
+
+      db.transaction(() => {
+        for (const [date, namePattern] of paymentStartDates) {
+          updatePaymentStart.run(date, namePattern);
+        }
+      })();
+      console.log("Migration: payment_start_date updated successfully.");
     }
   } catch (error) {
     console.error("DATABASE INITIALIZATION ERROR:", error);

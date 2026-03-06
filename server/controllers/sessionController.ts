@@ -13,8 +13,8 @@ export const getSessions = (req: Request, res: Response) => {
 };
 
 export const createSession = (req: Request, res: Response) => {
-  const { date, title, type, degree, description, attendance } = req.body;
-  const info = db.prepare("INSERT INTO sessions (date, title, type, degree, description) VALUES (?, ?, ?, ?, ?)").run(date, title, type, degree, description);
+  const { date, type, degree, description, attendance } = req.body;
+  const info = db.prepare("INSERT INTO sessions (date, type, degree, description) VALUES (?, ?, ?, ?)").run(date, type, degree, description);
   const sessionId = info.lastInsertRowid;
 
   const insertAttendance = db.prepare("INSERT INTO attendance (session_id, member_id, present) VALUES (?, ?, ?)");
@@ -37,12 +37,12 @@ export const getAttendance = (req: Request, res: Response) => {
 
 export const updateSession = (req: Request, res: Response) => {
   const { id } = req.params;
-  const { date, title, type, degree, description, attendance } = req.body;
-  console.log(`Updating session ${id}:`, { date, title, type, degree });
+  const { date, type, degree, description, attendance } = req.body;
+  console.log(`Updating session ${id}:`, { date, type, degree });
 
   const update = db.transaction((sessionId: string, sessionData: any, attendanceData: any) => {
-    db.prepare("UPDATE sessions SET date = ?, title = ?, type = ?, degree = ?, description = ? WHERE id = ?")
-      .run(sessionData.date, sessionData.title, sessionData.type, sessionData.degree, sessionData.description, sessionId);
+    db.prepare("UPDATE sessions SET date = ?, type = ?, degree = ?, description = ? WHERE id = ?")
+      .run(sessionData.date, sessionData.type, sessionData.degree, sessionData.description, sessionId);
 
     if (attendanceData) {
       // Delete old attendance and insert new
@@ -55,7 +55,7 @@ export const updateSession = (req: Request, res: Response) => {
   });
 
   try {
-    update(id, { date, title, type, degree, description }, attendance);
+    update(id, { date, type, degree, description }, attendance);
     res.json({ success: true });
   } catch (error) {
     console.error(`Error updating session ${id}:`, error);

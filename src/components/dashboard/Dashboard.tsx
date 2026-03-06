@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Wallet, Calendar, AlertCircle, CheckCircle2, Clock, ListChecks, ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Wallet, Calendar, AlertCircle, CheckCircle2, Clock, ListChecks, ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight, Eye, Info } from 'lucide-react';
 import { Member, Transaction, Session } from '../../types';
 import { StatCard } from '../ui/StatCard';
 import { Card } from '../ui/Card';
@@ -86,8 +86,16 @@ export const Dashboard = ({ user, transactions, sessions: allSessions }: {
         <StatCard 
           title="Status Tesouraria" 
           value={memberStats?.compliance || '---'} 
-          icon={memberStats?.compliance === 'Adimplente' ? CheckCircle2 : AlertCircle} 
-          color={memberStats?.compliance === 'Adimplente' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}
+          icon={
+            memberStats?.compliance === 'Adimplente' ? CheckCircle2 : 
+            memberStats?.compliance === 'Isento' ? Info : 
+            AlertCircle
+          } 
+          color={
+            memberStats?.compliance === 'Adimplente' ? "bg-emerald-50 text-emerald-600" : 
+            memberStats?.compliance === 'Isento' ? "bg-blue-50 text-blue-600" : 
+            "bg-rose-50 text-rose-600"
+          }
         />
         <StatCard 
           title="Mensalidades Pagas" 
@@ -151,7 +159,7 @@ export const Dashboard = ({ user, transactions, sessions: allSessions }: {
               <thead>
                 <tr className="text-left border-b border-slate-100">
                   <th className="pb-4 text-[10px] font-bold uppercase text-slate-400">Data</th>
-                  <th className="pb-4 text-[10px] font-bold uppercase text-slate-400">Título</th>
+                  <th className="pb-4 text-[10px] font-bold uppercase text-slate-400">Grau</th>
                   <th className="pb-4 text-[10px] font-bold uppercase text-slate-400 text-right">Tipo</th>
                 </tr>
               </thead>
@@ -160,10 +168,7 @@ export const Dashboard = ({ user, transactions, sessions: allSessions }: {
                   <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 text-xs font-bold text-slate-900">{s.date}</td>
                     <td className="py-4">
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-slate-700">{s.title}</span>
-                        <span className="text-[9px] text-slate-400 uppercase">{s.degree}</span>
-                      </div>
+                      <span className="text-[9px] text-slate-400 uppercase font-bold">{s.degree}</span>
                     </td>
                     <td className="py-4 text-right">
                       <span className="badge-base bg-slate-100 text-slate-600 text-[10px]">

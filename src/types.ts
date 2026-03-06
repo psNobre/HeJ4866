@@ -57,7 +57,6 @@ export interface Transaction {
 export interface Session {
   id: number;
   date: string;
-  title: string;
   type: 'Ordinária' | 'Magna' | 'Pública' | 'Administrativa';
   degree: 'Aprendiz' | 'Companheiro' | 'Mestre' | 'Pública';
   description?: string;
