@@ -378,6 +378,7 @@ function App() {
         activeTab={activeTab} 
         setActiveTab={handleTabChange} 
         isSidebarOpen={isSidebarOpen} 
+        setIsSidebarOpen={setIsSidebarOpen}
         user={user} 
         onLogout={() => setUser(null)} 
       />

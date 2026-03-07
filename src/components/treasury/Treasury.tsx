@@ -75,62 +75,67 @@ export const Treasury = ({
               <tr className="text-left border-b border-slate-100">
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 pl-4">Data</th>
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400">Descrição</th>
-                <th className="pb-6 text-xs-bold-uppercase text-slate-400">Categoria</th>
+                <th className="pb-6 text-xs-bold-uppercase text-slate-400 hidden md:table-cell">Categoria</th>
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 text-right pr-4">Valor</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {paginatedTransactions.map((t) => (
                 <tr key={t.id} className="table-row-hover">
-                  <td className="py-6 pl-4">
+                  <td className="py-4 md:py-6 pl-4">
                     <span className="text-sm font-bold text-slate-900">{t.date}</span>
                   </td>
-                  <td className="py-6">
-                    <div className="flex-items-center space-x-3">
-                      <div className={cn("icon-box w-10 h-10 rounded-xl", t.type === 'income' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600")}>
-                        {t.type === 'income' ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
+                  <td className="py-4 md:py-6">
+                    <div className="flex-items-center space-x-2 md:space-x-3">
+                      <div className={cn("icon-box w-8 h-8 md:w-10 md:h-10 rounded-xl", t.type === 'income' ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600")}>
+                        {t.type === 'income' ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-700">{t.description}</span>
-                        <div className="flex-items-center flex-wrap gap-2 mt-0.5">
-                          {t.memberName && <span className="text-[10px] text-zinc-950 font-bold uppercase tracking-wider">Obreiro: {t.memberName}</span>}
+                        <span className="text-sm font-bold text-slate-700 line-clamp-1">{t.description}</span>
+                        <div className="flex-items-center flex-wrap gap-1 md:gap-2 mt-0.5">
+                          {t.memberName && <span className="text-[9px] md:text-[10px] text-zinc-950 font-bold uppercase tracking-wider">Obreiro: {t.memberName}</span>}
                           {(t as any).paymentMonths ? (
-                            <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                            <span className="text-[9px] md:text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
                               Ref: {(t as any).paymentMonths}
                             </span>
                           ) : t.month && t.year && (
-                            <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                            <span className="text-[9px] md:text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
                               Ref: {t.month}/{t.year}
                             </span>
                           )}
+                          <span className="md:hidden text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                            {t.category}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="py-6">
+                  <td className="py-4 md:py-6 hidden md:table-cell">
                     <span className="badge-base bg-slate-100 text-slate-600">
                       {t.category}
                     </span>
                   </td>
-                  <td className="py-6 text-right pr-4">
-                    <div className="flex-center justify-end space-x-2">
-                      <span className={cn("text-sm font-bold mr-4", t.type === 'income' ? "text-emerald-600" : "text-rose-600")}>
+                  <td className="py-4 md:py-6 text-right pr-4">
+                    <div className="flex flex-col md:flex-row md:items-center justify-end md:space-x-2">
+                      <span className={cn("text-sm font-bold mb-2 md:mb-0 md:mr-4", t.type === 'income' ? "text-emerald-600" : "text-rose-600")}>
                         {t.type === 'income' ? '+' : '-'} R$ {t.amount.toLocaleString()}
                       </span>
-                      <button 
-                        onClick={() => onEditTransaction(t)}
-                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                        title="Editar Transação"
-                      >
-                        <Edit2 size={18} />
-                      </button>
-                      <button 
-                        onClick={() => onDeleteTransaction(t.id)}
-                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                        title="Excluir Transação"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      <div className="flex items-center justify-end space-x-1">
+                        <button 
+                          onClick={() => onEditTransaction(t)}
+                          className="p-1.5 md:p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                          title="Editar Transação"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => onDeleteTransaction(t.id)}
+                          className="p-1.5 md:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                          title="Excluir Transação"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>

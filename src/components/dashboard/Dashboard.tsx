@@ -159,7 +159,7 @@ export const Dashboard = ({ user, transactions, sessions: allSessions }: {
               <thead>
                 <tr className="text-left border-b border-slate-100">
                   <th className="pb-4 text-[10px] font-bold uppercase text-slate-400">Data</th>
-                  <th className="pb-4 text-[10px] font-bold uppercase text-slate-400">Grau</th>
+                  <th className="pb-4 text-[10px] font-bold uppercase text-slate-400 hidden sm:table-cell">Grau</th>
                   <th className="pb-4 text-[10px] font-bold uppercase text-slate-400 text-right">Tipo</th>
                 </tr>
               </thead>
@@ -167,7 +167,7 @@ export const Dashboard = ({ user, transactions, sessions: allSessions }: {
                 {paginatedSessions.map((s) => (
                   <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 text-xs font-bold text-slate-900">{s.date}</td>
-                    <td className="py-4">
+                    <td className="py-4 hidden sm:table-cell">
                       <span className="text-[9px] text-slate-400 uppercase font-bold">{s.degree}</span>
                     </td>
                     <td className="py-4 text-right">
