@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import db from "../models/db";
-import { normalizePalavra } from "../utils/normalize";
+import db from "../models/db.ts";
+import { normalizePalavra } from "../utils/normalize.ts";
 
 export const login = (req: Request, res: Response) => {
   const { cim, password, palavraSemestral } = req.body;

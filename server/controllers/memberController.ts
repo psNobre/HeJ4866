@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import db from "../models/db";
+import db from "../models/db.ts";
 
 export const getMembers = (req: Request, res: Response) => {
   const members = db.prepare(`

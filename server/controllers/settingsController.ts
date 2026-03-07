@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import db from "../models/db";
-import { normalizePalavra } from "../utils/normalize";
+import db from "../models/db.ts";
+import { normalizePalavra } from "../utils/normalize.ts";
 
 export const getPalavra = (req: Request, res: Response) => {
   // We don't return the actual hashed value for security, just a placeholder if it exists

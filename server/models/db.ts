@@ -1,9 +1,9 @@
 import Database from "better-sqlite3";
 import bcrypt from "bcrypt";
-import { normalizePalavra } from "../utils/normalize";
+import { normalizePalavra } from "../utils/normalize.ts";
 import path from "path";
-import { runMigrations } from "../utils/migrator";
-import { sessionsData, attendanceData } from "./seedData";
+import { runMigrations } from "../utils/migrator.ts";
+import { sessionsData, attendanceData } from "./seedData.ts";
 
 const isProd = process.env.NODE_ENV === "production";
 const defaultDbName = isProd ? "masonic_lodge_prod.db" : "masonic_lodge_dev.db";

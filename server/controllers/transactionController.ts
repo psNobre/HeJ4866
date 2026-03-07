@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import db from "../models/db";
+import db from "../models/db.ts";
 
 export const getTransactions = (req: Request, res: Response) => {
   const transactions = db.prepare(`

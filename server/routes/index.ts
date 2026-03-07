@@ -1,9 +1,9 @@
 import { Router } from "express";
-import authRoutes from "./authRoutes";
-import memberRoutes from "./memberRoutes";
-import sessionRoutes from "./sessionRoutes";
-import transactionRoutes from "./transactionRoutes";
-import settingsRoutes from "./settingsRoutes";
+import authRoutes from "./authRoutes.ts";
+import memberRoutes from "./memberRoutes.ts";
+import sessionRoutes from "./sessionRoutes.ts";
+import transactionRoutes from "./transactionRoutes.ts";
+import settingsRoutes from "./settingsRoutes.ts";
 
 const router = Router();
 

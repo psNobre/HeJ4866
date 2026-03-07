@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as memberController from "../controllers/memberController";
+import * as memberController from "../controllers/memberController.ts";
 
 const router = Router();
 
