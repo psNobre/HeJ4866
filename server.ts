@@ -50,7 +50,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, HOST, () => {
+  const server = app.listen(PORT, HOST, () => {
     console.log(`Humildade e Justiça nº 4866 - Server running on http://${HOST}:${PORT}`);
     
     // Initialize Database AFTER starting to listen to avoid health check timeouts
@@ -60,6 +60,24 @@ async function startServer() {
       console.log("Database initialized successfully.");
     } catch (dbError) {
       console.error("CRITICAL: Database initialization failed:", dbError);
+    }
+  });
+
+  server.on("error", (error: any) => {
+    if (error.code === "EADDRNOTAVAIL") {
+      console.warn(`WARNING: Address ${HOST} not available. Falling back to 0.0.0.0...`);
+      app.listen(PORT, "0.0.0.0", () => {
+        console.log(`Humildade e Justiça nº 4866 - Server running on http://0.0.0.0:${PORT} (fallback)`);
+        console.log("Initializing database (fallback)...");
+        try {
+          initDB();
+          console.log("Database initialized successfully.");
+        } catch (dbError) {
+          console.error("CRITICAL: Database initialization failed:", dbError);
+        }
+      });
+    } else {
+      console.error("Server error:", error);
     }
   });
 }
