@@ -1,5 +1,7 @@
-import Database from "better-sqlite3";
+import pkg from "better-sqlite3";
 import bcrypt from "bcrypt";
+
+const Database = (pkg as any).default || pkg;
 import { normalizePalavra } from "../utils/normalize.ts";
 import path from "path";
 import { runMigrations } from "../utils/migrator.ts";

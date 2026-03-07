@@ -1,8 +1,10 @@
-import Database from "better-sqlite3";
+import pkg from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 
-export function runMigrations(db: Database) {
+const Database = (pkg as any).default || pkg;
+
+export function runMigrations(db: any) {
   console.log("Running migrations...");
 
   // Create migrations table if it doesn't exist

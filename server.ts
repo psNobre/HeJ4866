@@ -11,28 +11,19 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
+  const HOST = process.env.HOST || "0.0.0.0";
 
   app.use(express.json());
 
   console.log("Starting server initialization...");
-  
-  try {
-    // Initialize Database
-    console.log("Initializing database...");
-    initDB();
-    console.log("Database initialized successfully.");
-  } catch (dbError) {
-    console.error("CRITICAL: Database initialization failed:", dbError);
-    // Continue for now, but the app might be broken
-  }
   
   // API Routes
   app.use("/api", apiRoutes);
   
   // Debug route to download DB
   app.get("/api/debug/download-db", (req, res) => {
-    const dbPath = path.join(process.cwd(), "masonic_lodge_dev.db");
-    res.download(dbPath, "masonic_lodge_dev.db");
+    const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), "masonic_lodge_dev.db");
+    res.download(dbPath, "masonic_lodge.db");
   });
   
   console.log("API routes registered.");
@@ -52,14 +43,24 @@ async function startServer() {
     }
   } else {
     console.log("Running in production mode.");
-    app.use(express.static(path.join(__dirname, "dist")));
+    const distPath = path.join(__dirname, "dist");
+    app.use(express.static(distPath));
     app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist", "index.html"));
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Humildade e Justiça nº 4866 - Server running on http://0.0.0.0:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Humildade e Justiça nº 4866 - Server running on http://${HOST}:${PORT}`);
+    
+    // Initialize Database AFTER starting to listen to avoid health check timeouts
+    console.log("Initializing database...");
+    try {
+      initDB();
+      console.log("Database initialized successfully.");
+    } catch (dbError) {
+      console.error("CRITICAL: Database initialization failed:", dbError);
+    }
   });
 }
 
