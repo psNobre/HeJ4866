@@ -1,22 +1,23 @@
-app = "humildade-e-justica"
-primary_region = "gru"
+# fly.toml app configuration file generated for hej4866 on 2026-03-07T13:34:16Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'hej4866'
+primary_region = 'iad'
 
 [build]
-  dockerfile = "Dockerfile"
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
-  count = 1
+  processes = ['app']
 
-[[mounts]]
-  source = "data"
-  destination = "/data"
-
-[env]
-  DATABASE_PATH = "/data/masonic_lodge.db"
-  NODE_ENV = "production"
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 1024
