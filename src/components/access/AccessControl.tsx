@@ -43,7 +43,7 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
 
   return (
     <div className="space-y-8">
-      <div className="grid-cols-3-responsive gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Member List */}
         <div className="lg:col-span-1">
           <Card title="Obreiros" subtitle="Selecione um obreiro para gerenciar">
@@ -87,7 +87,7 @@ export const AccessControl = ({ members, onUpdatePermissions }: AccessControlPro
               title={`Permissões: ${selectedMember.name}`} 
               subtitle="Defina quais abas este obreiro pode acessar"
             >
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {availableTabs.map(tab => {
                   const hasAccess = selectedMember.permissions?.includes(tab);
                   return (

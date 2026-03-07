@@ -118,7 +118,7 @@ export const MemberModal = ({
               className="input-base" 
             />
           </div>
-          <div className="flex items-center space-x-4 h-full pt-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:space-x-4 h-full pt-6 md:col-span-2">
             <label className="flex items-center space-x-3 cursor-pointer group">
               <input 
                 type="checkbox" 

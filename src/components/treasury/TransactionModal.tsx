@@ -107,7 +107,7 @@ export const TransactionModal = ({
           <X size={20} className="text-slate-400" />
         </button>
         <form onSubmit={handleFormSubmit} className="space-y-6 mt-10">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="label-base">Tipo</label>
               <select 
@@ -149,7 +149,7 @@ export const TransactionModal = ({
               placeholder="Ex: Mensalidade de Obreiro" 
             />
           </div>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="label-base">Categoria</label>
               <select 

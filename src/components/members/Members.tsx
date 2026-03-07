@@ -100,7 +100,7 @@ export const Members = ({
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 hidden md:table-cell">Tesouraria</th>
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 hidden sm:table-cell">Frequência</th>
                 <th className="pb-6 text-xs-bold-uppercase text-slate-400 hidden sm:table-cell">Status</th>
-                <th className="pb-6 text-xs-bold-uppercase text-slate-400 text-right pr-4">Ações</th>
+                <th className="pb-6 text-xs-bold-uppercase text-slate-400 hidden sm:table-cell text-right pr-4">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -108,7 +108,7 @@ export const Members = ({
                 const compliance = calculateCompliance(m, transactions);
                 return (
                   <tr key={m.id} className={cn("table-row-hover", m.disconnected ? "opacity-50" : "")}>
-                    <td className="py-4 md:py-6 pl-4">
+                    <td className="py-4 md:py-6 pl-4 pr-4 sm:pr-0">
                       <div className="flex-items-center space-x-3 md:space-x-4">
                         <div className="icon-box w-10 h-10 md:w-12 md:h-12 bg-slate-100 text-slate-400 font-bold text-base md:text-lg">
                           {m.name.charAt(0)}
@@ -118,7 +118,51 @@ export const Members = ({
                           <div className="flex flex-wrap gap-1 mt-0.5">
                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider lg:hidden">{m.degree}</span>
                             <span className="text-[9px] font-mono font-medium text-slate-400 xl:hidden">CIM: {m.cim}</span>
-                            {m.disconnected && <span className="text-[9px] bg-rose-50 text-rose-600 px-1 rounded font-bold uppercase sm:hidden">Desligado</span>}
+                            {!!m.disconnected && <span className="text-[9px] bg-rose-50 text-rose-600 px-1 rounded font-bold uppercase sm:hidden">Desligado</span>}
+                          </div>
+                          
+                          {/* Mobile-only info & actions */}
+                          <div className="mt-3 flex flex-col gap-2 sm:hidden">
+                            <div className="flex flex-wrap gap-2">
+                              <span className={cn(
+                                "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider",
+                                compliance === 'Adimplente' ? "bg-emerald-50 text-emerald-600" : 
+                                compliance === 'Inadimplente' ? "bg-rose-50 text-rose-600" : 
+                                "bg-slate-100 text-slate-500"
+                              )}>
+                                {compliance}
+                              </span>
+                              <span className={cn("text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider", m.paysThroughLodge ? "bg-amber-50 text-amber-600" : "bg-slate-100 text-slate-500")}>
+                                {m.paysThroughLodge ? "Recolhe" : "Isento"}
+                              </span>
+                            </div>
+                            
+                            <div className="flex flex-wrap items-center gap-2 pt-2">
+                              <button 
+                                onClick={() => onToggleFrequencyExempt(m.id)}
+                                className={cn("p-2.5 rounded-xl transition-all border shadow-sm", m.frequencyExempt ? "text-indigo-600 bg-indigo-50 border-indigo-100" : "text-slate-400 bg-white border-slate-200")}
+                              >
+                                <History size={16} />
+                              </button>
+                              <button 
+                                onClick={() => onTogglePays(m.id)}
+                                className={cn("p-2.5 rounded-xl transition-all border shadow-sm", m.paysThroughLodge ? "text-amber-600 bg-amber-50 border-amber-100" : "text-slate-400 bg-white border-slate-200")}
+                              >
+                                <Wallet size={16} />
+                              </button>
+                              <button 
+                                onClick={() => onToggleDisconnected(m.id)}
+                                className={cn("p-2.5 rounded-xl transition-all border shadow-sm", m.disconnected ? "text-emerald-600 bg-emerald-50 border-emerald-100" : "text-rose-600 bg-rose-50 border-rose-100")}
+                              >
+                                {m.disconnected ? <Shield size={16} /> : <UserX size={16} />}
+                              </button>
+                              <button 
+                                onClick={() => onEditMember(m)}
+                                className="p-2.5 text-slate-400 bg-white border border-slate-200 rounded-xl transition-all shadow-sm"
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -166,7 +210,7 @@ export const Members = ({
                         {m.disconnected ? "Desligado" : "Ativo"}
                       </span>
                     </td>
-                    <td className="py-4 md:py-6 text-right pr-4">
+                    <td className="py-4 md:py-6 text-right pr-4 hidden sm:table-cell">
                       <div className="flex items-center justify-end space-x-1">
                         <button 
                           onClick={() => onToggleFrequencyExempt(m.id)}

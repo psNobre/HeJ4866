@@ -89,38 +89,38 @@ export const Attendance = ({
         title="Frequência por Obreiro" 
         subtitle="Relação de presenças e faltas"
         action={
-          <div className="flex-items-center space-x-4">
+          <div className="flex flex-wrap items-center gap-3">
             <button 
               onClick={() => setShowOnlyNonExempt(!showOnlyNonExempt)}
               className={cn(
-                "flex-items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border",
+                "flex items-center space-x-2 px-3 py-2 rounded-xl text-[10px] md:text-xs font-bold transition-all border",
                 showOnlyNonExempt 
                   ? "bg-zinc-950 text-white border-zinc-950" 
                   : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
               )}
             >
               <Filter size={14} />
-              <span>{showOnlyNonExempt ? "Mostrando Apenas Ativos" : "Filtrar Abonados"}</span>
+              <span>{showOnlyNonExempt ? "Ativos" : "Abonados"}</span>
             </button>
 
-            <div className="flex-items-center bg-slate-50 p-1 rounded-xl border border-slate-100">
+            <div className="flex items-center bg-slate-50 p-1 rounded-xl border border-slate-100">
               <button 
                 onClick={() => setStatsFilter('all')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all ${statsFilter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 Tudo
               </button>
               <button 
                 onClick={() => setStatsFilter('12months')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === '12months' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all ${statsFilter === '12months' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
               >
                 12 Meses
               </button>
               <button 
                 onClick={() => setStatsFilter('year')}
-                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${statsFilter === 'year' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                className={`px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all ${statsFilter === 'year' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
               >
-                Este Ano
+                Ano
               </button>
             </div>
           </div>
