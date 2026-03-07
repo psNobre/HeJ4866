@@ -18,10 +18,6 @@ primary_region = "iad"
   memory = "1gb"
   memory_mb = 1_024
 
-[[mounts]]
-  source = "data"
-  destination = "/data"
-
 [env]
   DATABASE_PATH = "/data/masonic_lodge.db"
   NODE_ENV = "production"
