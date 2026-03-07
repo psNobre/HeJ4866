@@ -212,19 +212,13 @@ export const getMemberStats = (req: Request, res: Response) => {
 
     const paidTransactions = db.prepare(`
       SELECT month, year 
-      FROM transactions 
-      WHERE member_id = ? AND category = 'Mensalidade' AND type = 'income'
-    `).all(id) as { month: number | null, year: number | null }[];
+      FROM member_payments 
+      WHERE member_id = ?
+    `).all(id) as { month: number, year: number }[];
 
     const paidSet = new Set();
-    let oldPaymentsCount = 0;
-
     paidTransactions.forEach(p => {
-      if (p.month && p.year) {
-        paidSet.add(`${p.month}-${p.year}`);
-      } else {
-        oldPaymentsCount++;
-      }
+      paidSet.add(`${p.month}-${p.year}`);
     });
 
     const missingMonths: string[] = [];
@@ -234,13 +228,7 @@ export const getMemberStats = (req: Request, res: Response) => {
       const y = current.getFullYear();
       const key = `${m}-${y}`;
       
-      if (paidSet.has(key)) {
-        // Already paid
-      } else if (oldPaymentsCount > 0) {
-        // Use one of the old payments to cover this month
-        oldPaymentsCount--;
-      } else {
-        // Truly missing
+      if (!paidSet.has(key)) {
         const monthLabel = current.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
         missingMonths.push(monthLabel);
       }
@@ -272,6 +260,56 @@ export const getMemberSessions = (req: Request, res: Response) => {
       ORDER BY s.date DESC
     `).all(id);
     res.json(sessions);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const getMissingMonths = (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const member = db.prepare("SELECT initiation_date as initiationDate, payment_start_date as paymentStartDate, pays_through_lodge as paysThroughLodge FROM members WHERE id = ?").get(id) as any;
+    
+    if (!member || !member.paysThroughLodge) {
+      return res.json([]);
+    }
+
+    const startDateStr = member.paymentStartDate || member.initiationDate;
+    if (!startDateStr) {
+      return res.json([]);
+    }
+
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(); // Only up to current month
+    const limitDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+    const paidTransactions = db.prepare(`
+      SELECT month, year 
+      FROM member_payments 
+      WHERE member_id = ?
+    `).all(id) as { month: number, year: number }[];
+
+    const paidSet = new Set();
+    paidTransactions.forEach(p => {
+      paidSet.add(`${p.month}-${p.year}`);
+    });
+
+    const missingMonths: { month: number, year: number, label: string }[] = [];
+    let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    
+    while (current <= limitDate) {
+      const m = current.getMonth() + 1;
+      const y = current.getFullYear();
+      const key = `${m}-${y}`;
+      
+      if (!paidSet.has(key)) {
+        const label = current.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+        missingMonths.push({ month: m, year: y, label });
+      }
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    res.json(missingMonths);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

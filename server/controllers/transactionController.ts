@@ -3,7 +3,8 @@ import db from "../models/db";
 
 export const getTransactions = (req: Request, res: Response) => {
   const transactions = db.prepare(`
-    SELECT t.*, m.name as memberName 
+    SELECT t.*, m.name as memberName,
+    (SELECT GROUP_CONCAT(month || '/' || year, ', ') FROM member_payments WHERE transaction_id = t.id) as paymentMonths
     FROM transactions t 
     LEFT JOIN members m ON t.member_id = m.id 
     ORDER BY t.date DESC
@@ -12,10 +13,43 @@ export const getTransactions = (req: Request, res: Response) => {
 };
 
 export const createTransaction = (req: Request, res: Response) => {
-  const { date, description, amount, type, category, memberId, month, year } = req.body;
-  db.prepare("INSERT INTO transactions (date, description, amount, type, category, member_id, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-    .run(date, description, amount, type, category, memberId || null, month || null, year || null);
-  res.json({ success: true });
+  const { date, description, amount, type, category, memberId, month, year, payments } = req.body;
+  
+  const insertTransaction = db.prepare("INSERT INTO transactions (date, description, amount, type, category, member_id, month, year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+  const insertPayment = db.prepare("INSERT INTO member_payments (transaction_id, member_id, month, year) VALUES (?, ?, ?, ?)");
+
+  const create = db.transaction((data: any) => {
+    const info = insertTransaction.run(
+      data.date, 
+      data.description, 
+      data.amount, 
+      data.type, 
+      data.category, 
+      data.memberId || null, 
+      data.month || null, 
+      data.year || null
+    );
+    const transactionId = info.lastInsertRowid;
+
+    if (data.category === 'Mensalidade' && data.payments && Array.isArray(data.payments)) {
+      for (const p of data.payments) {
+        insertPayment.run(transactionId, data.memberId, p.month, p.year);
+      }
+    } else if (data.category === 'Mensalidade' && data.month && data.year) {
+      // Fallback for single payment if payments array is not provided
+      insertPayment.run(transactionId, data.memberId, data.month, data.year);
+    }
+    
+    return transactionId;
+  });
+
+  try {
+    const id = create({ date, description, amount, type, category, memberId, month, year, payments });
+    res.json({ success: true, id });
+  } catch (error: any) {
+    console.error("Error creating transaction:", error);
+    res.status(400).json({ error: error.message });
+  }
 };
 
 export const getStats = (req: Request, res: Response) => {
@@ -42,4 +76,64 @@ export const getStats = (req: Request, res: Response) => {
     activeMembers: memberStats.total,
     lastAttendanceRate: Math.round(attendanceRate)
   });
+};
+
+export const updateTransaction = (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { date, description, amount, type, category, memberId, month, year, payments } = req.body;
+
+  const updateTransactionStmt = db.prepare(`
+    UPDATE transactions 
+    SET date = ?, description = ?, amount = ?, type = ?, category = ?, member_id = ?, month = ?, year = ?
+    WHERE id = ?
+  `);
+  const deletePaymentsStmt = db.prepare("DELETE FROM member_payments WHERE transaction_id = ?");
+  const insertPaymentStmt = db.prepare("INSERT INTO member_payments (transaction_id, member_id, month, year) VALUES (?, ?, ?, ?)");
+
+  const update = db.transaction((data: any) => {
+    updateTransactionStmt.run(
+      data.date, 
+      data.description, 
+      data.amount, 
+      data.type, 
+      data.category, 
+      data.memberId || null, 
+      data.month || null, 
+      data.year || null,
+      data.id
+    );
+
+    deletePaymentsStmt.run(data.id);
+
+    if (data.category === 'Mensalidade' && data.payments && Array.isArray(data.payments)) {
+      for (const p of data.payments) {
+        insertPaymentStmt.run(data.id, data.memberId, p.month, p.year);
+      }
+    } else if (data.category === 'Mensalidade' && data.month && data.year) {
+      insertPaymentStmt.run(data.id, data.memberId, data.month, data.year);
+    }
+  });
+
+  try {
+    update({ id, date, description, amount, type, category, memberId, month, year, payments });
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error("Error updating transaction:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const deleteTransaction = (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const del = db.transaction(() => {
+      db.prepare("DELETE FROM member_payments WHERE transaction_id = ?").run(id);
+      db.prepare("DELETE FROM transactions WHERE id = ?").run(id);
+    });
+    del();
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error("Error deleting transaction:", error);
+    res.status(400).json({ error: error.message });
+  }
 };

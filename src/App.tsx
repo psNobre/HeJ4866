@@ -29,6 +29,7 @@ function App() {
   const [palavraSemestral, setPalavraSemestral] = useState('');
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [showSessionModal, setShowSessionModal] = useState(false);
@@ -128,23 +129,56 @@ function App() {
     }
   };
 
-  const handleAddTransaction = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData);
-    
-    const res = await fetch('/api/transactions', {
-      method: 'POST',
+  const handleSaveTransaction = async (data: any) => {
+    const url = editingTransaction ? `/api/transactions/${editingTransaction.id}` : '/api/transactions';
+    const method = editingTransaction ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
     if (res.ok) {
       setShowTransactionModal(false);
+      setEditingTransaction(null);
       fetchData();
-      toast.success("Transação registrada com sucesso!");
+      toast.success(editingTransaction ? "Transação atualizada com sucesso!" : "Transação registrada com sucesso!");
     } else {
-      toast.error("Erro ao registrar transação.");
+      toast.error(editingTransaction ? "Erro ao atualizar transação." : "Erro ao registrar transação.");
     }
+  };
+
+  const handleDeleteTransaction = async (id: number) => {
+    toast("Deseja realmente excluir esta transação?", {
+      description: "Esta ação não pode ser desfeita.",
+      action: {
+        label: "Confirmar Exclusão",
+        onClick: async () => {
+          toast.loading("Excluindo transação...", { id: "delete-transaction" });
+          try {
+            const res = await fetch(`/api/transactions/${id}`, { 
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (res.ok) {
+              await fetchData();
+              toast.success("Transação excluída com sucesso!", { id: "delete-transaction" });
+            } else {
+              const errorData = await res.json();
+              toast.error(errorData.error || "Erro ao excluir transação.", { id: "delete-transaction" });
+            }
+          } catch (error) {
+            console.error("Erro ao excluir transação:", error);
+            toast.error("Erro de conexão ao excluir transação.", { id: "delete-transaction" });
+          }
+        },
+      },
+      cancel: {
+        label: "Cancelar",
+        onClick: () => console.log("Exclusão cancelada"),
+      },
+    });
   };
 
   const handleAddMember = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -369,7 +403,13 @@ function App() {
               
               <Route path="/treasury" element={
                 <ProtectedRoute user={user} permission="treasury">
-                  <Treasury stats={stats} transactions={transactions} onAddTransaction={() => setShowTransactionModal(true)} />
+                  <Treasury 
+                    stats={stats} 
+                    transactions={transactions} 
+                    onAddTransaction={() => { setEditingTransaction(null); setShowTransactionModal(true); }} 
+                    onEditTransaction={(t) => { setEditingTransaction(t); setShowTransactionModal(true); }}
+                    onDeleteTransaction={handleDeleteTransaction}
+                  />
                 </ProtectedRoute>
               } />
               
@@ -422,7 +462,14 @@ function App() {
         </div>
       </main>
 
-      {showTransactionModal && <TransactionModal members={members} onClose={() => setShowTransactionModal(false)} onSubmit={handleAddTransaction} />}
+      {showTransactionModal && (
+        <TransactionModal 
+          members={members} 
+          transaction={editingTransaction}
+          onClose={() => { setShowTransactionModal(false); setEditingTransaction(null); }} 
+          onSubmit={handleSaveTransaction} 
+        />
+      )}
       {showMemberModal && <MemberModal member={editingMember} onClose={() => { setShowMemberModal(false); setEditingMember(null); }} onSubmit={handleAddMember} />}
       {showSessionModal && <SessionModal members={members} session={editingSession} onClose={() => { setShowSessionModal(false); setEditingSession(null); }} onSubmit={handleNewSession} />}
     </div>

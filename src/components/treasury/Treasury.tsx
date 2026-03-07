@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Wallet, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Wallet, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, ChevronLeft, ChevronRight, Edit2, Trash2 } from 'lucide-react';
 import { Transaction, Stats } from '../../types';
 import { Card } from '../ui/Card';
 import { cn } from '../../lib/utils';
@@ -9,11 +9,15 @@ const ITEMS_PER_PAGE = 10;
 export const Treasury = ({ 
   stats, 
   transactions, 
-  onAddTransaction 
+  onAddTransaction,
+  onEditTransaction,
+  onDeleteTransaction
 }: { 
   stats: Stats; 
   transactions: Transaction[]; 
   onAddTransaction: () => void;
+  onEditTransaction: (t: Transaction) => void;
+  onDeleteTransaction: (id: number) => void;
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -88,9 +92,13 @@ export const Treasury = ({
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-slate-700">{t.description}</span>
-                        <div className="flex-items-center space-x-2 mt-0.5">
+                        <div className="flex-items-center flex-wrap gap-2 mt-0.5">
                           {t.memberName && <span className="text-[10px] text-zinc-950 font-bold uppercase tracking-wider">Obreiro: {t.memberName}</span>}
-                          {t.month && t.year && (
+                          {(t as any).paymentMonths ? (
+                            <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                              Ref: {(t as any).paymentMonths}
+                            </span>
+                          ) : t.month && t.year && (
                             <span className="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
                               Ref: {t.month}/{t.year}
                             </span>
@@ -105,9 +113,25 @@ export const Treasury = ({
                     </span>
                   </td>
                   <td className="py-6 text-right pr-4">
-                    <span className={cn("text-sm font-bold", t.type === 'income' ? "text-emerald-600" : "text-rose-600")}>
-                      {t.type === 'income' ? '+' : '-'} R$ {t.amount.toLocaleString()}
-                    </span>
+                    <div className="flex-center justify-end space-x-2">
+                      <span className={cn("text-sm font-bold mr-4", t.type === 'income' ? "text-emerald-600" : "text-rose-600")}>
+                        {t.type === 'income' ? '+' : '-'} R$ {t.amount.toLocaleString()}
+                      </span>
+                      <button 
+                        onClick={() => onEditTransaction(t)}
+                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                        title="Editar Transação"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+                      <button 
+                        onClick={() => onDeleteTransaction(t.id)}
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                        title="Excluir Transação"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
