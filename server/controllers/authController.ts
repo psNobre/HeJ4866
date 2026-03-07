@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import db from "../models/db.ts";
 import { normalizePalavra } from "../utils/normalize.ts";
